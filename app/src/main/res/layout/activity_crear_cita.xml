@@ -205,8 +205,6 @@
             android:id="@+id/spinnerTipoConsulta"
             android:layout_width="match_parent"
             android:layout_height="48dp"
-            android:textColor="@color/black"
-            android:textColorHint="@color/gris_medio"
             android:background="@drawable/spinner_background"
             android:padding="12dp"
             android:layout_marginBottom="24dp" />

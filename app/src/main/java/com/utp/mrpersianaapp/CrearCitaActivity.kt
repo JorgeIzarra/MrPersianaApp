@@ -83,7 +83,7 @@ class CrearCitaActivity : AppCompatActivity() {
             android.R.layout.simple_spinner_item,
             tiposConsulta
         )
-        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+        adapter.setDropDownViewResource(R.layout.spinner_dropdown_item)
         spinnerTipoConsulta.adapter = adapter
 
         spinnerTipoConsulta.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
@@ -92,9 +92,9 @@ class CrearCitaActivity : AppCompatActivity() {
                     tipoConsultaSeleccionado = ""
                 } else {
                     tipoConsultaSeleccionado = tiposConsulta[position]
-                    // Cambiar color del texto seleccionado
-                    (view as? android.widget.TextView)?.setTextColor(resources.getColor(R.color.negro_texto, null))
                 }
+                // Aseguramos que el texto sea visible cambiando su color
+                (view as? android.widget.TextView)?.setTextColor(resources.getColor(R.color.negro_texto, null))
             }
 
             override fun onNothingSelected(parent: AdapterView<*>?) {}

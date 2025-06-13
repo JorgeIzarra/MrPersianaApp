@@ -56,15 +56,15 @@ class LoginActivity : AppCompatActivity() {
      * Configurar el Spinner de trabajadores
      */
     private fun setupSpinner() {
-        // Crear adaptador para el spinner (volvemos al método original)
+        // Crear adaptador para el spinner con layout predeterminado
         val adapter = ArrayAdapter(
             this,
             android.R.layout.simple_spinner_item,
             trabajadores
         )
 
-        // Configurar el layout para el dropdown
-        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+        // Configurar el layout personalizado para el dropdown
+        adapter.setDropDownViewResource(R.layout.spinner_dropdown_item)
 
         // Asignar adaptador al spinner
         spinnerTrabajadores.adapter = adapter
@@ -73,8 +73,7 @@ class LoginActivity : AppCompatActivity() {
         spinnerTrabajadores.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
             override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
                 handleWorkerSelection(position)
-
-                // AQUÍ está el truco: cambiar el color del texto después de seleccionar
+                // Aseguramos que el texto sea visible cambiando su color
                 (view as? TextView)?.setTextColor(resources.getColor(R.color.negro_texto, null))
             }
 
