@@ -1,0 +1,267 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/blanco"
+    android:fillViewport="true">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="24dp">
+
+        <!-- Header con logo pequeño -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:layout_marginTop="20dp"
+            android:layout_marginBottom="24dp"
+            android:padding="16dp"
+            android:background="@color/gris_claro">
+
+            <ImageView
+                android:id="@+id/ivLogoCrearCita"
+                android:layout_width="50dp"
+                android:layout_height="50dp"
+                android:src="@drawable/logo_mr_persiana"
+                android:layout_marginEnd="16dp"
+                android:contentDescription="Logo Mr. Persiana" />
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Crear Nueva Cita"
+                android:textSize="20sp"
+                android:textColor="@color/azul_oscuro"
+                android:textStyle="bold" />
+
+            <Button
+                android:id="@+id/btnVolver"
+                android:layout_width="wrap_content"
+                android:layout_height="40dp"
+                android:text="⬅️ VOLVER"
+                android:textSize="12sp"
+                android:textColor="@color/azul_principal"
+                android:background="@drawable/boton_salir_background"
+                android:padding="8dp" />
+
+        </LinearLayout>
+
+        <!-- Formulario -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Información del Cliente"
+            android:textSize="18sp"
+            android:textColor="@color/azul_oscuro"
+            android:textStyle="bold"
+            android:layout_marginBottom="16dp" />
+
+        <!-- Nombre del cliente -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Nombre del Cliente *"
+            android:textSize="16sp"
+            android:textColor="@color/negro_texto"
+            android:textStyle="bold"
+            android:layout_marginBottom="8dp" />
+
+        <EditText
+            android:id="@+id/etNombreCliente"
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:background="@drawable/edittext_background"
+            android:hint="Ingrese el nombre completo"
+            android:textSize="16sp"
+            android:textColor="@color/black"
+            android:textColorHint="@color/gris_medio"
+            android:padding="12dp"
+            android:layout_marginBottom="16dp"
+            android:inputType="textPersonName|textCapWords" />
+
+        <!-- Teléfono -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Teléfono *"
+            android:textSize="16sp"
+            android:textColor="@color/negro_texto"
+            android:textStyle="bold"
+            android:layout_marginBottom="8dp" />
+
+        <EditText
+            android:id="@+id/etTelefono"
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:background="@drawable/edittext_background"
+            android:hint="Ej: 6123-4567"
+            android:textSize="16sp"
+            android:textColor="@color/black"
+            android:textColorHint="@color/gris_medio"
+            android:padding="12dp"
+            android:layout_marginBottom="16dp"
+            android:inputType="phone" />
+
+        <!-- Dirección -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Dirección Completa *"
+            android:textSize="16sp"
+            android:textColor="@color/negro_texto"
+            android:textStyle="bold"
+            android:layout_marginBottom="8dp" />
+
+        <EditText
+            android:id="@+id/etDireccion"
+            android:layout_width="match_parent"
+            android:layout_height="80dp"
+            android:background="@drawable/edittext_background"
+            android:hint="Calle, casa/edificio, sector, ciudad"
+            android:textSize="16sp"
+            android:textColor="@color/black"
+            android:textColorHint="@color/gris_medio"
+            android:padding="12dp"
+            android:layout_marginBottom="20dp"
+            android:inputType="textMultiLine|textCapSentences"
+            android:gravity="top" />
+
+        <!-- Información de la Visita -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Información de la Visita"
+            android:textSize="18sp"
+            android:textColor="@color/azul_oscuro"
+            android:textStyle="bold"
+            android:layout_marginBottom="16dp" />
+
+        <!-- Fecha de visita -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Fecha de Visita *"
+            android:textSize="16sp"
+            android:textColor="@color/negro_texto"
+            android:textStyle="bold"
+            android:layout_marginBottom="8dp" />
+
+        <EditText
+            android:id="@+id/etFechaVisita"
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:background="@drawable/edittext_background"
+            android:hint="DD/MM/AAAA"
+            android:textSize="16sp"
+            android:textColor="@color/black"
+            android:textColorHint="@color/gris_medio"
+            android:padding="12dp"
+            android:layout_marginBottom="16dp"
+            android:inputType="date"
+            android:focusable="false"
+            android:clickable="true" />
+
+        <!-- Hora de visita -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Hora de Visita *"
+            android:textSize="16sp"
+            android:textColor="@color/negro_texto"
+            android:textStyle="bold"
+            android:layout_marginBottom="8dp" />
+
+        <EditText
+            android:id="@+id/etHoraVisita"
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:background="@drawable/edittext_background"
+            android:hint="HH:MM AM/PM"
+            android:textSize="16sp"
+            android:textColor="@color/black"
+            android:textColorHint="@color/gris_medio"
+            android:padding="12dp"
+            android:layout_marginBottom="16dp"
+            android:inputType="time"
+            android:focusable="false"
+            android:clickable="true" />
+
+        <!-- Tipo de consulta -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Tipo de Consulta *"
+            android:textSize="16sp"
+            android:textColor="@color/negro_texto"
+            android:textStyle="bold"
+            android:layout_marginBottom="8dp" />
+
+        <Spinner
+            android:id="@+id/spinnerTipoConsulta"
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:textColor="@color/black"
+            android:textColorHint="@color/gris_medio"
+            android:background="@drawable/spinner_background"
+            android:padding="12dp"
+            android:layout_marginBottom="24dp" />
+
+        <!-- Notas adicionales -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Notas Adicionales (Opcional)"
+            android:textSize="16sp"
+            android:textColor="@color/negro_texto"
+            android:textStyle="bold"
+            android:layout_marginBottom="8dp" />
+
+        <EditText
+            android:id="@+id/etNotasAdicionales"
+            android:layout_width="match_parent"
+            android:layout_height="80dp"
+            android:background="@drawable/edittext_background"
+            android:hint="Observaciones, preferencias, etc."
+            android:textSize="16sp"
+            android:textColor="@color/black"
+            android:textColorHint="@color/gris_medio"
+            android:padding="12dp"
+            android:layout_marginBottom="32dp"
+            android:inputType="textMultiLine|textCapSentences"
+            android:gravity="top" />
+
+        <!-- Botones -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <Button
+                android:id="@+id/btnGuardarCita"
+                style="@style/BotonPrincipal"
+                android:layout_width="match_parent"
+                android:layout_height="56dp"
+                android:text="💾 GUARDAR CITA"
+                android:textSize="18sp"
+                android:textStyle="bold"
+                android:layout_marginBottom="12dp" />
+
+            <Button
+                android:id="@+id/btnLimpiarFormulario"
+                style="@style/BotonSecundario"
+                android:layout_width="match_parent"
+                android:layout_height="48dp"
+                android:text="🗑️ LIMPIAR FORMULARIO"
+                android:textSize="16sp"
+                android:layout_marginBottom="24dp" />
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+</ScrollView>

@@ -1,0 +1,165 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/blanco"
+    android:fillViewport="true">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:padding="24dp">
+
+        <!-- Header con logo y bienvenida -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="30dp"
+            android:layout_marginBottom="32dp"
+            android:background="@color/gris_claro"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            android:padding="16dp">
+
+            <!-- Logo pequeño -->
+            <ImageView
+                android:id="@+id/ivLogoMenu"
+                android:layout_width="60dp"
+                android:layout_height="60dp"
+                android:layout_marginEnd="16dp"
+                android:contentDescription="Logo Mr. Persiana"
+                android:src="@drawable/logo_mr_persiana" />
+
+            <!-- Información del trabajador -->
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:orientation="vertical">
+
+                <TextView
+                    android:id="@+id/tvBienvenidaTrabajador"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="¡Bienvenido!"
+                    android:textColor="@color/azul_oscuro"
+                    android:textSize="18sp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/tvNombreTrabajador"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Usuario"
+                    android:textColor="@color/negro_texto"
+                    android:textSize="16sp" />
+
+                <TextView
+                    android:id="@+id/tvCargoTrabajador"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Cargo"
+                    android:textColor="@color/gris_medio"
+                    android:textSize="14sp" />
+
+            </LinearLayout>
+
+            <!-- Botón Cerrar Sesión -->
+            <Button
+                android:id="@+id/btnCerrarSesion"
+                android:layout_width="wrap_content"
+                android:layout_height="40dp"
+                android:layout_marginStart="8dp"
+                android:background="@drawable/boton_salir_background"
+                android:padding="8dp"
+                android:text="🚪 SALIR"
+                android:textColor="@color/azul_principal"
+                android:textSize="12sp" />
+
+        </LinearLayout>
+
+        <!-- Título del menú -->
+        <TextView
+            android:id="@+id/tvTituloMenu"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginTop="80dp"
+            android:layout_marginBottom="50dp"
+            android:text="¿Qué deseas hacer hoy?"
+            android:textColor="@color/azul_oscuro"
+            android:textSize="20sp"
+            android:textStyle="bold" />
+
+        <!-- Contenedor de botones -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="24dp"
+            android:gravity="center"
+            android:orientation="vertical">
+
+            <!-- Botón Crear Cita -->
+            <Button
+                android:id="@+id/btnCrearCita"
+                style="@style/BotonPrincipal"
+                android:layout_width="match_parent"
+                android:layout_height="64dp"
+                android:layout_marginBottom="16dp"
+                android:drawablePadding="8dp"
+                android:text="📅 CREAR CITA"
+                android:textSize="18sp"
+                android:textStyle="bold" />
+
+            <!-- Botón Crear Cotización -->
+            <Button
+                android:id="@+id/btnCrearCotizacion"
+                style="@style/BotonPrincipal"
+                android:layout_width="match_parent"
+                android:layout_height="64dp"
+                android:layout_marginBottom="16dp"
+                android:drawablePadding="8dp"
+                android:text="📋 CREAR COTIZACIÓN"
+                android:textSize="18sp"
+                android:textStyle="bold" />
+
+            <!-- Botón Ver Historial -->
+            <Button
+                android:id="@+id/btnVerHistorial"
+                style="@style/BotonPrincipal"
+                android:layout_width="match_parent"
+                android:layout_height="64dp"
+                android:layout_marginBottom="16dp"
+                android:drawablePadding="8dp"
+                android:text="📊 VER HISTORIAL"
+                android:textSize="18sp"
+                android:textStyle="bold" />
+
+            <!-- Botón Calendario -->
+            <Button
+                android:id="@+id/btnCalendario"
+                style="@style/BotonSecundario"
+                android:layout_width="match_parent"
+                android:layout_height="56dp"
+                android:drawablePadding="8dp"
+                android:text="🗓️ ABRIR CALENDARIO"
+                android:textSize="16sp"
+                android:textStyle="bold" />
+
+        </LinearLayout>
+
+        <!-- Footer con información adicional -->
+        <TextView
+            android:id="@+id/tvVersionInfo"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginTop="130dp"
+            android:text="Mr. Persiana v1.0 - Sistema de Cotización"
+            android:textColor="@color/gris_medio"
+            android:textSize="12sp" />
+
+    </LinearLayout>
+
+</ScrollView>

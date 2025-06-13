@@ -1,0 +1,42 @@
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <!-- Tema principal de Mr. Persiana -->
+    <style name="Theme.MrPersianaApp" parent="Theme.Material3.DayNight.NoActionBar">
+        <!-- Colores primarios -->
+        <item name="colorPrimary">@color/azul_principal</item>
+        <item name="colorPrimaryVariant">@color/azul_oscuro</item>
+        <item name="colorOnPrimary">@color/blanco</item>
+
+        <!-- Colores secundarios -->
+        <item name="colorSecondary">@color/naranja_persiana</item>
+        <item name="colorSecondaryVariant">@color/naranja_persiana</item>
+        <item name="colorOnSecondary">@color/blanco</item>
+
+        <!-- Colores de fondo -->
+        <item name="android:colorBackground">@color/blanco</item>
+        <item name="colorSurface">@color/gris_claro</item>
+        <item name="colorOnBackground">@color/negro_texto</item>
+        <item name="colorOnSurface">@color/negro_texto</item>
+
+        <!-- Status bar -->
+        <item name="android:statusBarColor">@color/azul_oscuro</item>
+        <item name="android:windowLightStatusBar">false</item>
+    </style>
+
+    <!-- Estilo para botones principales -->
+    <style name="BotonPrincipal" parent="Widget.Material3.Button">
+        <item name="backgroundTint">@color/azul_principal</item>
+        <item name="android:textColor">@color/blanco</item>
+        <item name="android:textSize">16sp</item>
+        <item name="android:layout_margin">8dp</item>
+        <item name="cornerRadius">8dp</item>
+    </style>
+
+    <!-- Estilo para botones secundarios -->
+    <style name="BotonSecundario" parent="Widget.Material3.Button.OutlinedButton">
+        <item name="strokeColor">@color/azul_principal</item>
+        <item name="android:textColor">@color/azul_principal</item>
+        <item name="android:textSize">16sp</item>
+        <item name="android:layout_margin">8dp</item>
+        <item name="cornerRadius">8dp</item>
+    </style>
+</resources>

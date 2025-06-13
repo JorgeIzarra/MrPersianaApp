@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="@color/blanco"
+    android:gravity="center"
+    android:padding="32dp">
+
+    <!-- Logo grande centrado -->
+    <ImageView
+        android:id="@+id/ivLogoLogin"
+        android:layout_width="200dp"
+        android:layout_height="200dp"
+        android:src="@drawable/logo_mr_persiana"
+        android:layout_marginBottom="48dp"
+        android:contentDescription="Logo Mr. Persiana" />
+
+    <!-- Título de bienvenida -->
+    <TextView
+        android:id="@+id/tvTituloBienvenida"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Bienvenido al Sistema"
+        android:textSize="24sp"
+        android:textColor="@color/azul_oscuro"
+        android:textStyle="bold"
+        android:layout_marginBottom="8dp" />
+
+    <TextView
+        android:id="@+id/tvSubtitulo"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Cotizador de Persianas y Cortinas"
+        android:textSize="16sp"
+        android:textColor="@color/gris_medio"
+        android:layout_marginBottom="40dp" />
+
+    <!-- Contenedor del Spinner -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:layout_marginBottom="32dp">
+
+        <TextView
+            android:id="@+id/tvLabelTrabajador"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Seleccionar Trabajador:"
+            android:textSize="16sp"
+            android:textColor="@color/negro_texto"
+            android:textStyle="bold"
+            android:layout_marginBottom="8dp" />
+
+        <Spinner
+            android:id="@+id/spinnerTrabajadores"
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:background="@drawable/spinner_background"
+            android:padding="12dp"
+            android:layout_marginBottom="16dp" />
+
+    </LinearLayout>
+
+    <!-- Botón de ingresar -->
+    <Button
+        android:id="@+id/btnIngresar"
+        style="@style/BotonPrincipal"
+        android:layout_width="match_parent"
+        android:layout_height="56dp"
+        android:text="INGRESAR AL SISTEMA"
+        android:textSize="18sp"
+        android:textStyle="bold"
+        android:enabled="false" />
+
+    <!-- Texto de información -->
+    <TextView
+        android:id="@+id/tvInfo"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Selecciona un trabajador para continuar"
+        android:textSize="14sp"
+        android:textColor="@color/gris_medio"
+        android:layout_marginTop="16dp" />
+
+</LinearLayout>
