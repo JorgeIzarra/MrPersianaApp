@@ -1,0 +1,325 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="@color/blanco">
+
+    <!-- Header con logo y filtros -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:layout_marginTop="50dp"
+        android:layout_marginBottom="16dp"
+        android:layout_marginHorizontal="24dp"
+        android:padding="16dp"
+        android:background="@color/gris_claro">
+
+        <ImageView
+            android:id="@+id/ivLogoLista"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:src="@drawable/logo_mr_persiana"
+            android:layout_marginEnd="16dp"
+            android:contentDescription="Logo Mr. Persiana" />
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Historial de Actividades"
+            android:textSize="20sp"
+            android:textColor="@color/azul_oscuro"
+            android:textStyle="bold" />
+
+        <Button
+            android:id="@+id/btnVolver"
+            android:layout_width="wrap_content"
+            android:layout_height="40dp"
+            android:text="⬅️ VOLVER"
+            android:textSize="12sp"
+            android:textColor="@color/azul_principal"
+            android:background="@drawable/boton_salir_background"
+            android:padding="8dp" />
+
+    </LinearLayout>
+
+    <!-- Mensaje de filtros aplicados (cuando están ocultos) -->
+    <LinearLayout
+        android:id="@+id/layoutFiltrosAplicados"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:layout_marginHorizontal="24dp"
+        android:layout_marginBottom="8dp"
+        android:visibility="gone">
+
+        <TextView
+            android:id="@+id/tvFiltrosAplicados"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="🏷️ Filtros: Solo Citas, Cliente: Juan"
+            android:textSize="12sp"
+            android:textColor="@color/gris_medio"
+            android:textStyle="italic" />
+
+        <Button
+            android:id="@+id/btnLimpiarFiltrosRapido"
+            android:layout_width="wrap_content"
+            android:layout_height="28dp"
+            android:text="✖️"
+            android:textSize="10sp"
+            android:textColor="@color/azul_principal"
+            android:background="@android:color/transparent"
+            android:padding="4dp" />
+
+    </LinearLayout>
+
+    <!-- Botón para mostrar/ocultar filtros -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:layout_marginHorizontal="24dp"
+        android:layout_marginBottom="8dp">
+
+        <Button
+            android:id="@+id/btnToggleFiltros"
+            style="@style/BotonSecundario"
+            android:layout_width="wrap_content"
+            android:layout_height="42dp"
+            android:text="🔍 MOSTRAR FILTROS"
+            android:textSize="14sp"
+            android:paddingHorizontal="16dp" />
+
+        <View
+            android:layout_width="0dp"
+            android:layout_height="1dp"
+            android:layout_weight="1" />
+
+        <TextView
+            android:id="@+id/tvContadorResultados"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="📊 Total: 0 elementos"
+            android:textSize="14sp"
+            android:textColor="@color/azul_oscuro"
+            android:textStyle="bold" />
+
+    </LinearLayout>
+
+    <!-- Sección de filtros (inicialmente oculta) -->
+    <LinearLayout
+        android:id="@+id/layoutFiltros"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:layout_marginHorizontal="24dp"
+        android:layout_marginBottom="16dp"
+        android:background="@drawable/filtros_background"
+        android:padding="16dp"
+        android:visibility="gone"
+        android:animateLayoutChanges="true">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="🔍 Filtros Avanzados"
+            android:textSize="16sp"
+            android:textColor="@color/azul_oscuro"
+            android:textStyle="bold"
+            android:layout_marginBottom="16dp" />
+
+        <!-- Tipo de vista -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Mostrar:"
+            android:textSize="16sp"
+            android:textColor="@color/negro_texto"
+            android:textStyle="bold"
+            android:layout_marginBottom="8dp" />
+
+        <Spinner
+            android:id="@+id/spinnerTipoVista"
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:background="@drawable/spinner_background"
+            android:padding="12dp"
+            android:layout_marginBottom="16dp" />
+
+        <!-- Filtro por cliente -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Buscar por cliente:"
+            android:textSize="16sp"
+            android:textColor="@color/negro_texto"
+            android:textStyle="bold"
+            android:layout_marginBottom="8dp" />
+
+        <EditText
+            android:id="@+id/etBuscarCliente"
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:background="@drawable/edittext_background"
+            android:hint="Nombre del cliente..."
+            android:textSize="16sp"
+            android:textColor="@color/black"
+            android:textColorHint="@color/gris_medio"
+            android:padding="12dp"
+            android:layout_marginBottom="16dp"
+            android:inputType="textPersonName|textCapWords" />
+
+        <!-- Botones de filtro rápido -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center">
+
+            <Button
+                android:id="@+id/btnFiltrarHoy"
+                style="@style/BotonSecundario"
+                android:layout_width="0dp"
+                android:layout_height="50dp"
+                android:layout_weight="1"
+                android:text="📅 HOY"
+                android:textSize="12sp"
+                android:layout_marginEnd="8dp" />
+
+            <Button
+                android:id="@+id/btnFiltrarSemana"
+                style="@style/BotonSecundario"
+                android:layout_width="0dp"
+                android:layout_height="50dp"
+                android:layout_weight="1"
+                android:text="📆 SEMANA"
+                android:textSize="10sp"
+                android:layout_marginHorizontal="4dp" />
+
+            <Button
+                android:id="@+id/btnLimpiarFiltros"
+                style="@style/BotonSecundario"
+                android:layout_width="0dp"
+                android:layout_height="50dp"
+                android:layout_weight="1"
+                android:text="🗑️ LIMPIAR"
+                android:textSize="10sp"
+                android:layout_marginStart="8dp" />
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+    <!-- Contador de resultados y orden (movido) -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:layout_marginHorizontal="24dp"
+        android:layout_marginBottom="8dp"
+        android:visibility="gone">
+
+        <Button
+            android:id="@+id/btnOrdenar"
+            android:layout_width="wrap_content"
+            android:layout_height="36dp"
+            android:text="🔄 ORDENAR"
+            android:textSize="12sp"
+            android:textColor="@color/azul_principal"
+            android:background="@drawable/boton_salir_background"
+            android:padding="8dp" />
+
+    </LinearLayout>
+
+    <!-- Lista de elementos -->
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/recyclerViewHistorial"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:layout_marginHorizontal="16dp"
+        android:layout_marginBottom="16dp"
+        android:background="@drawable/marco_lista"
+        android:clipToPadding="false"
+        android:paddingVertical="8dp" />
+
+    <!-- Mensaje cuando no hay datos -->
+    <LinearLayout
+        android:id="@+id/layoutSinDatos"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:orientation="vertical"
+        android:gravity="center"
+        android:visibility="gone"
+        android:padding="32dp">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="📝"
+            android:textSize="64sp"
+            android:layout_marginBottom="16dp" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="No hay elementos para mostrar"
+            android:textSize="18sp"
+            android:textColor="@color/gris_medio"
+            android:textStyle="bold"
+            android:layout_marginBottom="8dp" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Crea tu primera cita o cotización para comenzar"
+            android:textSize="14sp"
+            android:textColor="@color/gris_medio"
+            android:textAlignment="center" />
+
+    </LinearLayout>
+
+    <!-- Botones de acción flotantes -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_marginTop="10dp"
+        android:layout_marginStart="24dp"
+        android:layout_marginEnd="24dp"
+        android:layout_marginBottom="50dp">>
+
+        <Button
+            android:id="@+id/btnNuevaCita"
+            style="@style/BotonPrincipal"
+            android:layout_width="0dp"
+            android:layout_height="56dp"
+            android:layout_marginEnd="8dp"
+            android:layout_weight="1"
+            android:text="📅 NUEVA CITA"
+            android:textSize="16sp"
+            android:textStyle="bold" />
+
+        <Button
+            android:id="@+id/btnNuevaCotizacion"
+            style="@style/BotonPrincipal"
+            android:layout_width="0dp"
+            android:layout_height="56dp"
+            android:layout_weight="1"
+            android:text="📋 NUEVA COTIZACIÓN"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            android:layout_marginStart="8dp" />
+
+    </LinearLayout>
+
+</LinearLayout>

@@ -46,7 +46,8 @@
         <!-- ListaUnificadaActivity -->
         <activity
             android:name=".ListaUnificadaActivity"
-            android:exported="false" />
+            android:exported="false"
+            android:windowSoftInputMode="adjustResize" />
 
         <!-- MainActivity original (la podemos eliminar después) -->
         <activity

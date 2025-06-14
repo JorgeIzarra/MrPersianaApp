@@ -90,8 +90,8 @@ class MenuActivity : AppCompatActivity() {
 
         // Botón Ver Historial
         btnVerHistorial.setOnClickListener {
-            // TODO: Navegar a ListaUnificadaActivity
-            Toast.makeText(this, "Ver Historial - Próximamente", Toast.LENGTH_SHORT).show()
+            val intent = Intent(this, ListaUnificadaActivity::class.java)
+            startActivity(intent)
         }
 
         // Botón Calendario (Intent implícito)
