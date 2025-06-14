@@ -4,11 +4,14 @@ import android.app.DatePickerDialog
 import android.app.TimePickerDialog
 import android.content.Intent
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.view.View
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import android.widget.Button
 import android.widget.EditText
+import android.widget.ScrollView
 import android.widget.Spinner
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
@@ -17,6 +20,7 @@ import java.util.Calendar
 class CrearCitaActivity : AppCompatActivity() {
 
     // Componentes de la interfaz
+    private lateinit var scrollView: ScrollView
     private lateinit var etNombreCliente: EditText
     private lateinit var etTelefono: EditText
     private lateinit var etDireccion: EditText
@@ -56,12 +60,16 @@ class CrearCitaActivity : AppCompatActivity() {
 
         // Configurar botones
         setupButtons()
+
+        // Configurar scroll automático para el campo de notas
+        setupNotasScrollListener()
     }
 
     /**
      * Inicializar todos los componentes de la interfaz
      */
     private fun initializeComponents() {
+        scrollView = findViewById(R.id.scrollViewCrearCita)
         etNombreCliente = findViewById(R.id.etNombreCliente)
         etTelefono = findViewById(R.id.etTelefono)
         etDireccion = findViewById(R.id.etDireccion)
@@ -286,6 +294,46 @@ class CrearCitaActivity : AppCompatActivity() {
         etDireccion.error = null
 
         Toast.makeText(this, "Formulario limpiado", Toast.LENGTH_SHORT).show()
+    }
+
+    /**
+     * Configurar scroll automático para el campo de notas
+     */
+    private fun setupNotasScrollListener() {
+        etNotasAdicionales.setOnFocusChangeListener { _, hasFocus ->
+            if (hasFocus) {
+                // Esperar a que aparezca el teclado y luego hacer scroll
+                Handler(Looper.getMainLooper()).postDelayed({
+                    scrollToField(etNotasAdicionales)
+                }, 300) // Delay para dar tiempo al teclado
+            }
+        }
+
+        // También manejar cuando se hace clic en el campo
+        etNotasAdicionales.setOnClickListener {
+            Handler(Looper.getMainLooper()).postDelayed({
+                scrollToField(etNotasAdicionales)
+            }, 300)
+        }
+    }
+
+    /**
+     * Hacer scroll automático a un campo específico
+     */
+    private fun scrollToField(field: EditText) {
+        val location = IntArray(2)
+        field.getLocationOnScreen(location)
+
+        // Calcular la posición ideal para el scroll
+        val fieldY = location[1]
+        val screenHeight = resources.displayMetrics.heightPixels
+        val keyboardHeight = screenHeight / 3 // Estimación del teclado
+
+        // Si el campo está muy abajo, hacer scroll
+        if (fieldY > screenHeight - keyboardHeight - 200) {
+            val scrollY = fieldY - (screenHeight - keyboardHeight - 300)
+            scrollView.smoothScrollTo(0, scrollY)
+        }
     }
 
     /**

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/scrollViewCrearCita"
+    android:id="@+id/scrollViewCrearCotizacion"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/blanco"
@@ -24,7 +24,7 @@
             android:background="@color/gris_claro">
 
             <ImageView
-                android:id="@+id/ivLogoCrearCita"
+                android:id="@+id/ivLogoCrearCotizacion"
                 android:layout_width="50dp"
                 android:layout_height="50dp"
                 android:src="@drawable/logo_mr_persiana"
@@ -35,7 +35,7 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:text="Crear Nueva Cita"
+                android:text="Crear Nueva Cotización"
                 android:textSize="20sp"
                 android:textColor="@color/azul_oscuro"
                 android:textStyle="bold" />
@@ -52,17 +52,35 @@
 
         </LinearLayout>
 
-        <!-- Formulario -->
+        <!-- Información básica -->
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Información del Cliente"
+            android:text="Información General"
             android:textSize="18sp"
             android:textColor="@color/azul_oscuro"
             android:textStyle="bold"
             android:layout_marginBottom="16dp" />
 
-        <!-- Nombre del cliente -->
+        <!-- Seleccionar cita vinculada -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Cita Vinculada (Opcional)"
+            android:textSize="16sp"
+            android:textColor="@color/negro_texto"
+            android:textStyle="bold"
+            android:layout_marginBottom="8dp" />
+
+        <Spinner
+            android:id="@+id/spinnerCitaVinculada"
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:background="@drawable/spinner_background"
+            android:padding="12dp"
+            android:layout_marginBottom="16dp" />
+
+        <!-- Cliente (manual o desde cita) -->
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -77,179 +95,187 @@
             android:layout_width="match_parent"
             android:layout_height="48dp"
             android:background="@drawable/edittext_background"
-            android:hint="Ingrese el nombre completo"
-            android:textSize="16sp"
-            android:textColor="@color/black"
-            android:textColorHint="@color/gris_medio"
-            android:padding="12dp"
-            android:layout_marginBottom="16dp"
-            android:inputType="textPersonName|textCapWords" />
-
-        <!-- Teléfono -->
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Teléfono *"
-            android:textSize="16sp"
-            android:textColor="@color/negro_texto"
-            android:textStyle="bold"
-            android:layout_marginBottom="8dp" />
-
-        <EditText
-            android:id="@+id/etTelefono"
-            android:layout_width="match_parent"
-            android:layout_height="48dp"
-            android:background="@drawable/edittext_background"
-            android:hint="Ej: 6123-4567"
-            android:textSize="16sp"
-            android:textColor="@color/black"
-            android:textColorHint="@color/gris_medio"
-            android:padding="12dp"
-            android:layout_marginBottom="16dp"
-            android:inputType="phone" />
-
-        <!-- Dirección -->
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Dirección Completa *"
-            android:textSize="16sp"
-            android:textColor="@color/negro_texto"
-            android:textStyle="bold"
-            android:layout_marginBottom="8dp" />
-
-        <EditText
-            android:id="@+id/etDireccion"
-            android:layout_width="match_parent"
-            android:layout_height="80dp"
-            android:background="@drawable/edittext_background"
-            android:hint="Calle, casa/edificio, sector, ciudad"
+            android:hint="Ingrese el nombre del cliente"
             android:textSize="16sp"
             android:textColor="@color/black"
             android:textColorHint="@color/gris_medio"
             android:padding="12dp"
             android:layout_marginBottom="20dp"
-            android:inputType="textMultiLine|textCapSentences"
-            android:gravity="top" />
+            android:inputType="textPersonName|textCapWords" />
 
-        <!-- Información de la Visita -->
+        <!-- PRODUCTO 1 (Siempre visible) -->
+        <include layout="@layout/item_producto_cotizacion"
+            android:id="@+id/producto1"/>
+
+        <!-- PRODUCTO 2 (Inicialmente oculto) -->
+        <include layout="@layout/item_producto_cotizacion"
+            android:id="@+id/producto2"
+            android:visibility="gone"/>
+
+        <!-- PRODUCTO 3 (Inicialmente oculto) -->
+        <include layout="@layout/item_producto_cotizacion"
+            android:id="@+id/producto3"
+            android:visibility="gone"/>
+
+        <!-- PRODUCTO 4 (Inicialmente oculto) -->
+        <include layout="@layout/item_producto_cotizacion"
+            android:id="@+id/producto4"
+            android:visibility="gone"/>
+
+        <!-- Botón Agregar Producto -->
+        <Button
+            android:id="@+id/btnAgregarProducto"
+            style="@style/BotonSecundario"
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:text="➕ AGREGAR OTRO PRODUCTO"
+            android:textSize="16sp"
+            android:layout_marginBottom="24dp" />
+
+        <!-- Información de instalación -->
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Información de la Visita"
+            android:text="Información de Instalación"
             android:textSize="18sp"
             android:textColor="@color/azul_oscuro"
             android:textStyle="bold"
             android:layout_marginBottom="16dp" />
 
-        <!-- Fecha de visita -->
+        <!-- Ubicación de instalación -->
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Fecha de Visita *"
+            android:text="Ubicación de Instalación *"
+            android:textSize="16sp"
+            android:textColor="@color/negro_texto"
+            android:textStyle="bold"
+            android:layout_marginBottom="12dp" />
+
+        <RadioGroup
+            android:id="@+id/rgUbicacionInstalacion"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="16dp">
+
+            <RadioButton
+                android:id="@+id/rbCiudad"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="🏢 En la ciudad (precio estándar)"
+                android:textSize="16sp"
+                android:textColor="@color/negro_texto"
+                android:layout_marginBottom="8dp" />
+
+            <RadioButton
+                android:id="@+id/rbAfueras"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="🚗 Afueras/Interior (+$25 traslado)"
+                android:textSize="16sp"
+                android:textColor="@color/negro_texto" />
+
+        </RadioGroup>
+
+        <!-- Observaciones generales -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Observaciones Generales (Opcional)"
             android:textSize="16sp"
             android:textColor="@color/negro_texto"
             android:textStyle="bold"
             android:layout_marginBottom="8dp" />
 
         <EditText
-            android:id="@+id/etFechaVisita"
-            android:layout_width="match_parent"
-            android:layout_height="48dp"
-            android:background="@drawable/edittext_background"
-            android:hint="DD/MM/AAAA"
-            android:textSize="16sp"
-            android:textColor="@color/black"
-            android:textColorHint="@color/gris_medio"
-            android:padding="12dp"
-            android:layout_marginBottom="16dp"
-            android:inputType="date"
-            android:focusable="false"
-            android:clickable="true" />
-
-        <!-- Hora de visita -->
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Hora de Visita *"
-            android:textSize="16sp"
-            android:textColor="@color/negro_texto"
-            android:textStyle="bold"
-            android:layout_marginBottom="8dp" />
-
-        <EditText
-            android:id="@+id/etHoraVisita"
-            android:layout_width="match_parent"
-            android:layout_height="48dp"
-            android:background="@drawable/edittext_background"
-            android:hint="HH:MM AM/PM"
-            android:textSize="16sp"
-            android:textColor="@color/black"
-            android:textColorHint="@color/gris_medio"
-            android:padding="12dp"
-            android:layout_marginBottom="16dp"
-            android:inputType="time"
-            android:focusable="false"
-            android:clickable="true" />
-
-        <!-- Tipo de consulta -->
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Tipo de Consulta *"
-            android:textSize="16sp"
-            android:textColor="@color/negro_texto"
-            android:textStyle="bold"
-            android:layout_marginBottom="8dp" />
-
-        <Spinner
-            android:id="@+id/spinnerTipoConsulta"
-            android:layout_width="match_parent"
-            android:layout_height="48dp"
-            android:background="@drawable/spinner_background"
-            android:padding="12dp"
-            android:layout_marginBottom="24dp" />
-
-        <!-- Notas adicionales -->
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Notas Adicionales (Opcional)"
-            android:textSize="16sp"
-            android:textColor="@color/negro_texto"
-            android:textStyle="bold"
-            android:layout_marginBottom="8dp" />
-
-        <EditText
-            android:id="@+id/etNotasAdicionales"
+            android:id="@+id/etObservaciones"
             android:layout_width="match_parent"
             android:layout_height="80dp"
             android:background="@drawable/edittext_background"
-            android:hint="Observaciones, preferencias, etc."
+            android:hint="Instrucciones especiales, fechas de entrega, etc."
             android:textSize="16sp"
             android:textColor="@color/black"
             android:textColorHint="@color/gris_medio"
             android:padding="12dp"
-            android:layout_marginBottom="32dp"
+            android:layout_marginBottom="24dp"
             android:inputType="textMultiLine|textCapSentences"
             android:gravity="top" />
+
+        <!-- Resumen de precio -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:background="@color/azul_principal"
+            android:padding="16dp"
+            android:layout_marginBottom="24dp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="💰 Resumen de Cotización"
+                android:textSize="18sp"
+                android:textColor="@color/blanco"
+                android:textStyle="bold"
+                android:layout_marginBottom="8dp" />
+
+            <TextView
+                android:id="@+id/tvSubtotal"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Subtotal: $0.00"
+                android:textSize="16sp"
+                android:textColor="@color/blanco" />
+
+            <TextView
+                android:id="@+id/tvInstalacion"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Instalación: $0.00"
+                android:textSize="16sp"
+                android:textColor="@color/blanco" />
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="@color/blanco"
+                android:layout_marginVertical="8dp" />
+
+            <TextView
+                android:id="@+id/tvTotal"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="TOTAL: $0.00"
+                android:textSize="20sp"
+                android:textColor="@color/blanco"
+                android:textStyle="bold" />
+
+        </LinearLayout>
 
         <!-- Botones -->
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_marginBottom="24dp"
             android:layout_height="wrap_content"
-            android:orientation="vertical">
-
+            android:orientation="vertical"
+            android:layout_marginBottom="24dp">
 
             <Button
-                android:id="@+id/btnGuardarCita"
+                android:id="@+id/btnGuardarCotizacion"
                 style="@style/BotonPrincipal"
                 android:layout_width="match_parent"
                 android:layout_height="56dp"
-                android:text="💾 GUARDAR CITA"
+                android:text="💾 GUARDAR COTIZACIÓN"
                 android:textSize="18sp"
                 android:textStyle="bold"
+                android:layout_marginBottom="12dp" />
+
+            <Button
+                android:id="@+id/btnCompartirCotizacion"
+                style="@style/BotonSecundario"
+                android:layout_width="match_parent"
+                android:layout_height="48dp"
+                android:text="📤 COMPARTIR POR WHATSAPP"
+                android:textSize="16sp"
                 android:layout_marginBottom="12dp" />
 
             <Button
@@ -263,7 +289,7 @@
 
         </LinearLayout>
 
-        <!-- Información del proceso (para dar espacio y contexto) -->
+        <!-- Información del proceso -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -275,7 +301,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="ℹ️ Siguiente paso:"
+                android:text="📱 Compartir Cotización:"
                 android:textSize="16sp"
                 android:textColor="@color/azul_oscuro"
                 android:textStyle="bold"
@@ -284,7 +310,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Una vez guardada la cita, podrás crear una cotización vinculada y compartirla con el cliente por WhatsApp o email."
+                android:text="Puedes compartir esta cotización directamente por WhatsApp, email o cualquier app instalada. El cliente recibirá un resumen profesional con todos los detalles."
                 android:textSize="14sp"
                 android:textColor="@color/negro_texto"
                 android:lineSpacingExtra="2dp" />
@@ -292,7 +318,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="💡 Tip: Incluye todos los detalles posibles para una cotización más precisa."
+                android:text="💡 Tip: Revisa bien los precios antes de compartir la cotización."
                 android:textSize="13sp"
                 android:textColor="@color/gris_medio"
                 android:layout_marginTop="8dp"

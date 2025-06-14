@@ -84,8 +84,8 @@ class MenuActivity : AppCompatActivity() {
 
         // Botón Crear Cotización
         btnCrearCotizacion.setOnClickListener {
-            // TODO: Navegar a CrearCotizacionActivity
-            Toast.makeText(this, "Crear Cotización - Próximamente", Toast.LENGTH_SHORT).show()
+            val intent = Intent(this, CrearCotizacionActivity::class.java)
+            startActivity(intent)
         }
 
         // Botón Ver Historial

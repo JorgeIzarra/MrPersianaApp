@@ -1,0 +1,446 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:background="@drawable/producto_item_background"
+    android:padding="16dp"
+    android:layout_marginBottom="16dp">
+
+    <!-- Header del producto -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:layout_marginBottom="16dp">
+
+        <TextView
+            android:id="@+id/tvTituloProducto"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="🏷️ Producto 1"
+            android:textSize="18sp"
+            android:textColor="@color/azul_oscuro"
+            android:textStyle="bold" />
+
+        <Button
+            android:id="@+id/btnEliminarProducto"
+            android:layout_width="wrap_content"
+            android:layout_height="32dp"
+            android:text="❌"
+            android:textSize="12sp"
+            android:background="@android:color/transparent"
+            android:padding="4dp"
+            android:visibility="gone" />
+
+    </LinearLayout>
+
+    <!-- Tipo principal de producto -->
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Tipo de Producto *"
+        android:textSize="16sp"
+        android:textColor="@color/negro_texto"
+        android:textStyle="bold"
+        android:layout_marginBottom="8dp" />
+
+    <Spinner
+        android:id="@+id/spinnerTipoProducto"
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        android:background="@drawable/spinner_background"
+        android:padding="12dp"
+        android:layout_marginBottom="16dp" />
+
+    <!-- Sección PERSIANAS (inicialmente oculta) -->
+    <LinearLayout
+        android:id="@+id/layoutPersianas"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:visibility="gone">
+
+        <!-- Tipo de Persiana -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Tipo de Persiana *"
+            android:textSize="16sp"
+            android:textColor="@color/negro_texto"
+            android:textStyle="bold"
+            android:layout_marginBottom="8dp" />
+
+        <Spinner
+            android:id="@+id/spinnerTipoPersiana"
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:background="@drawable/spinner_background"
+            android:padding="12dp"
+            android:layout_marginBottom="16dp" />
+
+        <!-- Color de tela -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Color de Tela *"
+            android:textSize="16sp"
+            android:textColor="@color/negro_texto"
+            android:textStyle="bold"
+            android:layout_marginBottom="8dp" />
+
+        <Spinner
+            android:id="@+id/spinnerColorPersiana"
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:background="@drawable/spinner_background"
+            android:padding="12dp"
+            android:layout_marginBottom="16dp" />
+
+        <!-- Cenefa -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Cenefa"
+            android:textSize="16sp"
+            android:textColor="@color/negro_texto"
+            android:textStyle="bold"
+            android:layout_marginBottom="12dp" />
+
+        <RadioGroup
+            android:id="@+id/rgCenefaPersiana"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginBottom="16dp">
+
+            <RadioButton
+                android:id="@+id/rbConCenefa"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="✅ Con cenefa"
+                android:textColor="@color/black"
+                android:textSize="14sp"
+                android:layout_marginEnd="24dp" />
+
+            <RadioButton
+                android:id="@+id/rbSinCenefa"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="❌ Sin cenefa"
+                android:textColor="@color/black"
+                android:textSize="14sp"
+                android:checked="true" />
+
+        </RadioGroup>
+
+        <!-- Accionamiento Persiana -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Accionamiento"
+            android:textSize="16sp"
+            android:textColor="@color/negro_texto"
+            android:textStyle="bold"
+            android:layout_marginBottom="12dp" />
+
+        <RadioGroup
+            android:id="@+id/rgAccionamientoPersiana"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginBottom="16dp">
+
+            <RadioButton
+                android:id="@+id/rbManualPersiana"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="🖐️ Manual"
+                android:textColor="@color/black"
+                android:textSize="14sp"
+                android:layout_marginEnd="24dp"
+                android:checked="true" />
+
+            <RadioButton
+                android:id="@+id/rbMotorizadaPersiana"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="⚡ Motorizada (+40%)"
+                android:textColor="@color/black"
+                android:textSize="14sp" />
+
+        </RadioGroup>
+
+    </LinearLayout>
+
+    <!-- Sección CORTINAS (inicialmente oculta) -->
+    <LinearLayout
+        android:id="@+id/layoutCortinas"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:visibility="gone">
+
+        <!-- Tipo de Cortina -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Tipo de Cortina *"
+            android:textSize="16sp"
+            android:textColor="@color/negro_texto"
+            android:textStyle="bold"
+            android:layout_marginBottom="8dp" />
+
+        <Spinner
+            android:id="@+id/spinnerTipoCortina"
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:background="@drawable/spinner_background"
+            android:padding="12dp"
+            android:layout_marginBottom="16dp" />
+
+        <!-- Color de tela -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Color de Tela *"
+            android:textSize="16sp"
+            android:textColor="@color/negro_texto"
+            android:textStyle="bold"
+            android:layout_marginBottom="8dp" />
+
+        <Spinner
+            android:id="@+id/spinnerColorCortina"
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:background="@drawable/spinner_background"
+            android:padding="12dp"
+            android:layout_marginBottom="16dp" />
+
+        <!-- Apertura -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Apertura"
+            android:textSize="16sp"
+            android:textColor="@color/negro_texto"
+            android:textStyle="bold"
+            android:layout_marginBottom="12dp" />
+
+        <RadioGroup
+            android:id="@+id/rgAperturaCortina"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginBottom="16dp">
+
+            <RadioButton
+                android:id="@+id/rbAperturaCentral"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="↔️ Central"
+                android:textColor="@color/black"
+                android:textSize="14sp"
+                android:layout_marginEnd="24dp"
+                android:checked="true" />
+
+            <RadioButton
+                android:id="@+id/rbAperturaLateral"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="➡️ Lateral"
+                android:textColor="@color/black"
+                android:textSize="14sp" />
+
+        </RadioGroup>
+
+        <!-- Accionamiento Cortina -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Accionamiento"
+            android:textSize="16sp"
+            android:textColor="@color/negro_texto"
+            android:textStyle="bold"
+            android:layout_marginBottom="12dp" />
+
+        <RadioGroup
+            android:id="@+id/rgAccionamientoCortina"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginBottom="16dp">
+
+            <RadioButton
+                android:id="@+id/rbManualCortina"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="🖐️ Manual"
+                android:textColor="@color/black"
+                android:textSize="14sp"
+                android:layout_marginEnd="24dp"
+                android:checked="true" />
+
+            <RadioButton
+                android:id="@+id/rbMotorizadaCortina"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="⚡ Motorizada (+40%)"
+                android:textColor="@color/black"
+                android:textSize="14sp" />
+
+        </RadioGroup>
+
+    </LinearLayout>
+
+    <!-- Dimensiones y cantidad (común para ambos) -->
+    <LinearLayout
+        android:id="@+id/layoutDimensiones"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:visibility="gone">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Dimensiones y Cantidad"
+            android:textSize="16sp"
+            android:textColor="@color/negro_texto"
+            android:textStyle="bold"
+            android:layout_marginBottom="12dp" />
+
+        <!-- Ancho y Alto -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginBottom="16dp">
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:orientation="vertical"
+                android:layout_marginEnd="8dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Ancho (m) *"
+                    android:textSize="14sp"
+                    android:textColor="@color/negro_texto"
+                    android:layout_marginBottom="4dp" />
+
+                <EditText
+                    android:id="@+id/etAncho"
+                    android:layout_width="match_parent"
+                    android:layout_height="44dp"
+                    android:background="@drawable/edittext_background"
+                    android:hint="2.5"
+                    android:textSize="16sp"
+                    android:textColor="@color/black"
+                    android:textColorHint="@color/gris_medio"
+                    android:padding="8dp"
+                    android:inputType="numberDecimal" />
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:orientation="vertical"
+                android:layout_marginStart="8dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Alto (m) *"
+                    android:textSize="14sp"
+                    android:textColor="@color/negro_texto"
+                    android:layout_marginBottom="4dp" />
+
+                <EditText
+                    android:id="@+id/etAlto"
+                    android:layout_width="match_parent"
+                    android:layout_height="44dp"
+                    android:background="@drawable/edittext_background"
+                    android:hint="1.8"
+                    android:textSize="16sp"
+                    android:textColor="@color/black"
+                    android:textColorHint="@color/gris_medio"
+                    android:padding="8dp"
+                    android:inputType="numberDecimal" />
+
+            </LinearLayout>
+
+        </LinearLayout>
+
+        <!-- Cantidad -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:layout_marginBottom="16dp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Cantidad: "
+                android:textSize="16sp"
+                android:textColor="@color/negro_texto"
+                android:textStyle="bold"
+                android:layout_marginEnd="16dp" />
+
+            <Button
+                android:id="@+id/btnMenosCantidad"
+                android:layout_width="60dp"
+                android:layout_height="50dp"
+                android:text="-"
+                android:textSize="20sp"
+                android:background="@drawable/boton_salir_background"
+                android:textColor="@color/black"
+                android:layout_marginEnd="8dp" />
+
+            <TextView
+                android:id="@+id/tvCantidad"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="1"
+                android:textSize="18sp"
+                android:textColor="@color/negro_texto"
+                android:textStyle="bold"
+                android:minWidth="40dp"
+                android:gravity="center"
+                android:layout_marginHorizontal="8dp" />
+
+            <Button
+                android:id="@+id/btnMasCantidad"
+                android:layout_width="60dp"
+                android:layout_height="50dp"
+                android:text="+"
+                android:textSize="20sp"
+                android:background="@drawable/boton_salir_background"
+                android:textColor="@color/black"
+                android:layout_marginStart="8dp" />
+
+        </LinearLayout>
+
+        <!-- Precio del producto -->
+        <TextView
+            android:id="@+id/tvPrecioProducto"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Precio: $0.00"
+            android:textSize="16sp"
+            android:textColor="@color/azul_oscuro"
+            android:textStyle="bold"
+            android:layout_gravity="end" />
+
+    </LinearLayout>
+
+</LinearLayout>
