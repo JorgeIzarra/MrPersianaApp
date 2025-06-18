@@ -1,0 +1,550 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/blanco"
+    android:fillViewport="true">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="24dp">
+
+        <!-- Header con logo pequeño -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:layout_marginTop="20dp"
+            android:layout_marginBottom="24dp"
+            android:padding="16dp"
+            android:background="@color/gris_claro">
+
+            <ImageView
+                android:id="@+id/ivLogoDetalle"
+                android:layout_width="50dp"
+                android:layout_height="50dp"
+                android:src="@drawable/logo_mr_persiana"
+                android:layout_marginEnd="16dp"
+                android:contentDescription="Logo Mr. Persiana" />
+
+            <TextView
+                android:id="@+id/tvTipoDetalle"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="📅 DETALLE DE CITA"
+                android:textSize="20sp"
+                android:textColor="@color/azul_oscuro"
+                android:textStyle="bold" />
+
+            <Button
+                android:id="@+id/btnVolver"
+                android:layout_width="wrap_content"
+                android:layout_height="45dp"
+                android:background="@drawable/boton_salir_background"
+                android:padding="8dp"
+                android:text="⬅️ VOLVER"
+                android:textColor="@color/azul_principal"
+                android:textSize="12sp" />
+
+        </LinearLayout>
+
+        <!-- Información general -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:background="@color/azul_principal"
+            android:padding="16dp"
+            android:layout_marginBottom="24dp">
+
+            <TextView
+                android:id="@+id/tvNombreCliente"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Juan Pérez"
+                android:textSize="24sp"
+                android:textColor="@color/blanco"
+                android:textStyle="bold"
+                android:layout_marginBottom="8dp" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical">
+
+                <TextView
+                    android:id="@+id/tvFechaCreacion"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="Creada: 18/06/2025"
+                    android:textSize="14sp"
+                    android:textColor="@color/blanco" />
+
+                <TextView
+                    android:id="@+id/tvEstado"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="PENDIENTE"
+                    android:textSize="12sp"
+                    android:textColor="@color/azul_principal"
+                    android:textStyle="bold"
+                    android:background="@color/blanco"
+                    android:paddingHorizontal="8dp"
+                    android:paddingVertical="4dp" />
+
+            </LinearLayout>
+
+        </LinearLayout>
+
+        <!-- Información específica de CITA -->
+        <LinearLayout
+            android:id="@+id/layoutInfoCita"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:layout_marginBottom="24dp"
+            android:visibility="gone">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="📞 Información de Contacto"
+                android:textSize="18sp"
+                android:textColor="@color/azul_oscuro"
+                android:textStyle="bold"
+                android:layout_marginBottom="16dp" />
+
+            <!-- Teléfono -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginBottom="12dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="📱 Teléfono: "
+                    android:textSize="16sp"
+                    android:textColor="@color/negro_texto"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/tvTelefonoCita"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="6123-4567"
+                    android:textSize="16sp"
+                    android:textColor="@color/negro_texto" />
+
+            </LinearLayout>
+
+            <!-- Dirección -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:layout_marginBottom="16dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="📍 Dirección:"
+                    android:textSize="16sp"
+                    android:textColor="@color/negro_texto"
+                    android:textStyle="bold"
+                    android:layout_marginBottom="4dp" />
+
+                <TextView
+                    android:id="@+id/tvDireccionCita"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Calle 50, Casa 123, San Francisco"
+                    android:textSize="16sp"
+                    android:textColor="@color/negro_texto"
+                    android:background="@color/gris_claro"
+                    android:padding="12dp" />
+
+            </LinearLayout>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="🕐 Información de la Visita"
+                android:textSize="18sp"
+                android:textColor="@color/azul_oscuro"
+                android:textStyle="bold"
+                android:layout_marginBottom="16dp" />
+
+            <!-- Fecha y Hora -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginBottom="12dp">
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:orientation="vertical"
+                    android:layout_marginEnd="8dp">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="📅 Fecha:"
+                        android:textSize="14sp"
+                        android:textColor="@color/negro_texto"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:id="@+id/tvFechaVisita"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="25/06/2025"
+                        android:textSize="16sp"
+                        android:textColor="@color/negro_texto" />
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:orientation="vertical"
+                    android:layout_marginStart="8dp">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="⏰ Hora:"
+                        android:textSize="14sp"
+                        android:textColor="@color/negro_texto"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:id="@+id/tvHoraVisita"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="10:30 AM"
+                        android:textSize="16sp"
+                        android:textColor="@color/negro_texto" />
+
+                </LinearLayout>
+
+            </LinearLayout>
+
+            <!-- Tipo de consulta -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginBottom="16dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="🏷️ Tipo: "
+                    android:textSize="16sp"
+                    android:textColor="@color/negro_texto"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/tvTipoConsulta"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="Persianas y Cortinas"
+                    android:textSize="16sp"
+                    android:textColor="@color/azul_principal"
+                    android:textStyle="bold" />
+
+            </LinearLayout>
+
+            <!-- Notas -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="📝 Notas Adicionales:"
+                android:textSize="16sp"
+                android:textColor="@color/negro_texto"
+                android:textStyle="bold"
+                android:layout_marginBottom="8dp" />
+
+            <TextView
+                android:id="@+id/tvNotasCita"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="El cliente prefiere colores neutros y está interesado en sistema motorizado."
+                android:textSize="14sp"
+                android:textColor="@color/negro_texto"
+                android:background="@color/gris_claro"
+                android:padding="12dp"
+                android:minHeight="60dp" />
+
+        </LinearLayout>
+
+        <!-- Información específica de COTIZACIÓN -->
+        <LinearLayout
+            android:id="@+id/layoutInfoCotizacion"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:layout_marginBottom="24dp"
+            android:visibility="gone">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="📋 Información de la Cotización"
+                android:textSize="18sp"
+                android:textColor="@color/azul_oscuro"
+                android:textStyle="bold"
+                android:layout_marginBottom="16dp" />
+
+            <!-- Cita vinculada -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginBottom="12dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="🔗 Cita: "
+                    android:textSize="16sp"
+                    android:textColor="@color/negro_texto"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/tvCitaVinculada"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="Sin cita vinculada"
+                    android:textSize="16sp"
+                    android:textColor="@color/negro_texto" />
+
+            </LinearLayout>
+
+            <!-- Ubicación de instalación -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginBottom="16dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="📍 Instalación: "
+                    android:textSize="16sp"
+                    android:textColor="@color/negro_texto"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/tvUbicacionInstalacion"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="En la ciudad"
+                    android:textSize="16sp"
+                    android:textColor="@color/negro_texto" />
+
+            </LinearLayout>
+
+            <!-- Observaciones -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="📝 Observaciones:"
+                android:textSize="16sp"
+                android:textColor="@color/negro_texto"
+                android:textStyle="bold"
+                android:layout_marginBottom="8dp" />
+
+            <TextView
+                android:id="@+id/tvObservacionesCotizacion"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Instalación preferible en las mañanas."
+                android:textSize="14sp"
+                android:textColor="@color/negro_texto"
+                android:background="@color/gris_claro"
+                android:padding="12dp"
+                android:minHeight="60dp" />
+
+        </LinearLayout>
+
+        <!-- Lista de productos (solo cotización) -->
+        <LinearLayout
+            android:id="@+id/layoutProductos"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:layout_marginBottom="24dp"
+            android:visibility="gone">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="🏷️ Productos Cotizados"
+                android:textSize="18sp"
+                android:textColor="@color/azul_oscuro"
+                android:textStyle="bold"
+                android:layout_marginBottom="16dp" />
+
+            <TextView
+                android:id="@+id/tvListaProductos"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="• Persiana Screen Blanca - 2.5m x 1.8m - Cantidad: 2\n• Cortina Blackout Gris - 3.0m x 2.0m - Cantidad: 1"
+                android:textSize="14sp"
+                android:textColor="@color/negro_texto"
+                android:background="@color/gris_claro"
+                android:padding="16dp"
+                android:lineSpacingExtra="4dp" />
+
+        </LinearLayout>
+
+        <!-- Totales de cotización -->
+        <LinearLayout
+            android:id="@+id/layoutTotales"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:background="@color/azul_principal"
+            android:padding="16dp"
+            android:layout_marginBottom="32dp"
+            android:visibility="gone">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="💰 Resumen de Precios"
+                android:textSize="18sp"
+                android:textColor="@color/blanco"
+                android:textStyle="bold"
+                android:layout_marginBottom="12dp" />
+
+            <TextView
+                android:id="@+id/tvSubtotalDetalle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Subtotal: $450.00"
+                android:textSize="16sp"
+                android:textColor="@color/blanco"
+                android:layout_marginBottom="4dp" />
+
+            <TextView
+                android:id="@+id/tvInstalacionDetalle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Instalación: $0.00"
+                android:textSize="16sp"
+                android:textColor="@color/blanco"
+                android:layout_marginBottom="8dp" />
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="@color/blanco"
+                android:layout_marginVertical="8dp" />
+
+            <TextView
+                android:id="@+id/tvTotalDetalle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="TOTAL: $450.00"
+                android:textSize="20sp"
+                android:textColor="@color/blanco"
+                android:textStyle="bold" />
+
+        </LinearLayout>
+
+        <!-- Botones de acción -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:layout_marginBottom="32dp">
+
+            <Button
+                android:id="@+id/btnCompartir"
+                style="@style/BotonPrincipal"
+                android:layout_width="match_parent"
+                android:layout_height="56dp"
+                android:text="📤 COMPARTIR"
+                android:textSize="18sp"
+                android:textStyle="bold"
+                android:layout_marginBottom="12dp" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <Button
+                    android:id="@+id/btnVerMaps"
+                    style="@style/BotonSecundario"
+                    android:layout_width="0dp"
+                    android:layout_height="48dp"
+                    android:layout_weight="1"
+                    android:text="🗺️ VER MAPS"
+                    android:textSize="14sp"
+                    android:layout_marginEnd="8dp"
+                    android:visibility="gone" />
+
+                <Button
+                    android:id="@+id/btnEditar"
+                    style="@style/BotonSecundario"
+                    android:layout_width="0dp"
+                    android:layout_height="48dp"
+                    android:layout_weight="1"
+                    android:text="✏️ EDITAR"
+                    android:textSize="14sp"
+                    android:layout_marginStart="8dp" />
+
+            </LinearLayout>
+
+        </LinearLayout>
+
+        <!-- Footer informativo -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:background="@color/gris_claro"
+            android:layout_marginBottom="30dp"
+            android:padding="16dp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="ℹ️ Información"
+                android:textSize="16sp"
+                android:textColor="@color/azul_oscuro"
+                android:textStyle="bold"
+                android:layout_marginBottom="8dp" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Puedes compartir esta información directamente con el cliente o editarla si necesitas hacer cambios."
+                android:textSize="14sp"
+                android:textColor="@color/negro_texto" />
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+</ScrollView>

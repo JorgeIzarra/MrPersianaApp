@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
-
     <!-- Permisos necesarios para Intent implícitos -->
     <uses-permission android:name="android.permission.INTERNET" />
 
@@ -15,41 +14,34 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.MrPersianaApp"
         tools:targetApi="31">
-
+        <activity
+            android:name=".DetalleActivity"
+            android:exported="false" />
         <!-- LoginActivity como LAUNCHER (pantalla inicial) -->
         <activity
             android:name=".LoginActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
+
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
-        </activity>
-
-        <!-- MenuActivity -->
+        </activity> <!-- MenuActivity -->
         <activity
             android:name=".MenuActivity"
-            android:exported="false" />
-
-        <!-- CrearCitaActivity -->
+            android:exported="false" /> <!-- CrearCitaActivity -->
         <activity
             android:name=".CrearCitaActivity"
             android:exported="false"
-            android:windowSoftInputMode="adjustPan|adjustResize" />
-
-        <!-- CrearCotizacionActivity -->
+            android:windowSoftInputMode="adjustPan|adjustResize" /> <!-- CrearCotizacionActivity -->
         <activity
             android:name=".CrearCotizacionActivity"
             android:exported="false"
-            android:windowSoftInputMode="adjustPan|adjustResize" />
-
-        <!-- ListaUnificadaActivity -->
+            android:windowSoftInputMode="adjustPan|adjustResize" /> <!-- ListaUnificadaActivity -->
         <activity
             android:name=".ListaUnificadaActivity"
             android:exported="false"
-            android:windowSoftInputMode="adjustResize" />
-
-        <!-- MainActivity original (la podemos eliminar después) -->
+            android:windowSoftInputMode="adjustResize" /> <!-- MainActivity original (la podemos eliminar después) -->
         <activity
             android:name=".MainActivity"
             android:exported="false" />

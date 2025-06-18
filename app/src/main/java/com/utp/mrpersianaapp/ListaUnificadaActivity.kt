@@ -97,12 +97,18 @@ class ListaUnificadaActivity : AppCompatActivity() {
     }
 
     private fun setupRecyclerView() {
-        adapter = HistorialAdapter(listaFiltrada) { item ->
-            when (item.tipo) {
-                TipoItem.CITA -> mostrarDetalleCita(item)
-                TipoItem.COTIZACION -> mostrarDetalleCotizacion(item)
+        adapter = HistorialAdapter(listaFiltrada,
+            onItemClick = { item ->
+                // Navegar a DetalleActivity con los datos del item
+                navegarADetalle(item)
+            },
+            onMapsClick = { item ->
+                abrirMaps(item.direccion)
+            },
+            onCompartirClick = { item ->
+                compartirItem(item)
             }
-        }
+        )
 
         recyclerViewHistorial.layoutManager = LinearLayoutManager(this)
         recyclerViewHistorial.adapter = adapter
@@ -317,6 +323,86 @@ class ListaUnificadaActivity : AppCompatActivity() {
         adapter.notifyDataSetChanged()
     }
 
+    /**
+     * Navegar a DetalleActivity con los datos del item seleccionado
+     */
+    private fun navegarADetalle(item: ItemHistorial) {
+        val bundle = Bundle().apply {
+            putString("nombre_cliente", item.nombreCliente)
+            putString("fecha_creacion", item.fecha)
+            putString("estado", item.estado)
+
+            if (item.tipo == TipoItem.CITA) {
+                // Datos específicos de cita
+                putString("telefono", item.telefono ?: "Sin teléfono")
+                putString("direccion", item.direccion)
+                putString("fecha_visita", item.fechaVisita ?: item.fecha)
+                putString("hora_visita", item.hora)
+                putString("tipo_consulta", item.tipoProducto)
+                putString("notas_adicionales", item.notasAdicionales ?: "Sin notas adicionales")
+            } else {
+                // Datos específicos de cotización
+                putString("cita_vinculada", item.citaVinculada ?: "Sin cita vinculada")
+                putString("ubicacion_instalacion", item.ubicacionInstalacion ?: "En la ciudad")
+                putString("observaciones", item.observaciones ?: "Sin observaciones")
+                putString("productos_detalle", item.productosDetalle ?: "No hay productos registrados")
+                putString("subtotal", "Subtotal: $${String.format("%.2f", item.subtotal ?: 0.0)}")
+                putString("instalacion", "Instalación: $${String.format("%.2f", item.costoInstalacion ?: 0.0)}")
+                putString("total", "TOTAL: $${String.format("%.2f", item.precio)}")
+            }
+        }
+
+        val intent = Intent(this, DetalleActivity::class.java)
+        intent.putExtra("tipo_detalle", if (item.tipo == TipoItem.CITA) "CITA" else "COTIZACION")
+        intent.putExtra("datos", bundle)
+
+        startActivity(intent)
+    }
+
+    /**
+     * Abrir ubicación en Google Maps
+     */
+    private fun abrirMaps(direccion: String) {
+        val intent = Intent(Intent.ACTION_VIEW, Uri.parse("geo:0,0?q=$direccion"))
+        startActivity(intent)
+    }
+
+    /**
+     * Compartir item
+     */
+    private fun compartirItem(item: ItemHistorial) {
+        val texto = if (item.tipo == TipoItem.CITA) {
+            """
+                📅 CITA - MR. PERSIANA
+                
+                Cliente: ${item.nombreCliente}
+                Fecha: ${item.fecha} - ${item.hora}
+                Tipo: ${item.tipoProducto}
+                Dirección: ${item.direccion}
+                
+                📞 Contacto: Mr. Persiana
+            """.trimIndent()
+        } else {
+            """
+                📋 COTIZACIÓN - MR. PERSIANA
+                
+                Cliente: ${item.nombreCliente}
+                Tipo: ${item.tipoProducto}
+                Total: $${String.format("%.2f", item.precio)}
+                
+                📞 Contacto: Mr. Persiana
+                ✅ Cotización válida por 30 días
+            """.trimIndent()
+        }
+
+        val intent = Intent(Intent.ACTION_SEND)
+        intent.type = "text/plain"
+        intent.putExtra(Intent.EXTRA_TEXT, texto)
+        intent.putExtra(Intent.EXTRA_SUBJECT, "Mr. Persiana - ${if (item.tipo == TipoItem.CITA) "Cita" else "Cotización"}")
+
+        startActivity(Intent.createChooser(intent, "Compartir por:"))
+    }
+
     private fun cargarDatosEjemplo() {
         // Datos de ejemplo para testing
         listaCompleta.addAll(listOf(
@@ -327,7 +413,10 @@ class ListaUnificadaActivity : AppCompatActivity() {
                 hora = "10:30 AM",
                 estado = "PENDIENTE",
                 direccion = "Calle 50, Casa 123, San Francisco",
-                tipoProducto = "Persianas"
+                tipoProducto = "Persianas",
+                telefono = "6123-4567",
+                fechaVisita = "20/06/2025",
+                notasAdicionales = "Cliente prefiere colores neutros"
             ),
             ItemHistorial(
                 tipo = TipoItem.COTIZACION,
@@ -336,7 +425,20 @@ class ListaUnificadaActivity : AppCompatActivity() {
                 hora = "14:00 PM",
                 estado = "ENVIADA",
                 precio = 450.0,
-                tipoProducto = "Cortinas"
+                tipoProducto = "Cortinas",
+                citaVinculada = "María García - 03/07/2025",
+                ubicacionInstalacion = "En la ciudad",
+                observaciones = "Instalación en horario matutino",
+                productosDetalle = """• Producto 1: Cortinas
+  📏 Dimensiones: 3.0m x 2.0m
+  📦 Cantidad: 2 unidades
+  🏷️ Tipo: Blackout
+  🎨 Color: Gris Oscuro
+  📐 Apertura: ↔️ Apertura central (dos paños)
+  🔧 Accionamiento: 🖐️ Manual (cordón/varilla)
+  💰 Precio: $420.00""",
+                subtotal = 420.0,
+                costoInstalacion = 0.0
             ),
             ItemHistorial(
                 tipo = TipoItem.CITA,
@@ -345,7 +447,10 @@ class ListaUnificadaActivity : AppCompatActivity() {
                 hora = "09:00 AM",
                 estado = "COMPLETADA",
                 direccion = "Avenida Balboa, Edificio Plaza, Apt 505",
-                tipoProducto = "Persianas y Cortinas"
+                tipoProducto = "Persianas y Cortinas",
+                telefono = "6987-6543",
+                fechaVisita = "16/06/2025",
+                notasAdicionales = "Medición realizada, cliente solicita presupuesto urgente"
             ),
             ItemHistorial(
                 tipo = TipoItem.COTIZACION,
@@ -354,37 +459,22 @@ class ListaUnificadaActivity : AppCompatActivity() {
                 hora = "16:30 PM",
                 estado = "CERRADA",
                 precio = 320.0,
-                tipoProducto = "Persianas"
+                tipoProducto = "Persianas",
+                citaVinculada = "Sin cita vinculada",
+                ubicacionInstalacion = "Afueras/Interior (+$25 traslado)",
+                observaciones = "Cliente aprobó el proyecto",
+                productosDetalle = """• Producto 1: Persianas
+  📏 Dimensiones: 2.5m x 1.8m
+  📦 Cantidad: 1 unidades
+  🏷️ Tipo: Screen
+  🎨 Color: Blanco
+  🎀 Cenefa: ❌ Sin cenefa
+  🔧 Accionamiento: 🖐️ Manual (cadena/cordón)
+  💰 Precio: $202.50""",
+                subtotal = 202.5,
+                costoInstalacion = 25.0
             )
         ))
-    }
-
-    private fun mostrarDetalleCita(item: ItemHistorial) {
-        val mensaje = """
-            📅 DETALLE DE CITA
-            
-            Cliente: ${item.nombreCliente}
-            Fecha: ${item.fecha} - ${item.hora}
-            Tipo: ${item.tipoProducto}
-            Estado: ${item.estado}
-            Dirección: ${item.direccion}
-        """.trimIndent()
-
-        Toast.makeText(this, mensaje, Toast.LENGTH_LONG).show()
-    }
-
-    private fun mostrarDetalleCotizacion(item: ItemHistorial) {
-        val mensaje = """
-            📋 DETALLE DE COTIZACIÓN
-            
-            Cliente: ${item.nombreCliente}
-            Fecha: ${item.fecha}
-            Tipo: ${item.tipoProducto}
-            Estado: ${item.estado}
-            Precio: $${String.format("%.2f", item.precio)}
-        """.trimIndent()
-
-        Toast.makeText(this, mensaje, Toast.LENGTH_LONG).show()
     }
 
     private fun volverAlMenu() {
@@ -399,7 +489,7 @@ enum class TipoItem {
     CITA, COTIZACION
 }
 
-// Data class para items del historial
+// Data class mejorada para items del historial
 data class ItemHistorial(
     val tipo: TipoItem,
     val nombreCliente: String,
@@ -408,13 +498,26 @@ data class ItemHistorial(
     val estado: String,
     val direccion: String = "",
     val precio: Double = 0.0,
-    val tipoProducto: String = ""
+    val tipoProducto: String = "",
+    // Campos adicionales para citas
+    val telefono: String? = null,
+    val fechaVisita: String? = null,
+    val notasAdicionales: String? = null,
+    // Campos adicionales para cotizaciones
+    val citaVinculada: String? = null,
+    val ubicacionInstalacion: String? = null,
+    val observaciones: String? = null,
+    val productosDetalle: String? = null,
+    val subtotal: Double? = null,
+    val costoInstalacion: Double? = null
 )
 
-// Adapter para RecyclerView
+// Adapter mejorado para RecyclerView
 class HistorialAdapter(
     private val lista: List<ItemHistorial>,
-    private val onItemClick: (ItemHistorial) -> Unit
+    private val onItemClick: (ItemHistorial) -> Unit,
+    private val onMapsClick: (ItemHistorial) -> Unit,
+    private val onCompartirClick: (ItemHistorial) -> Unit
 ) : RecyclerView.Adapter<HistorialAdapter.ViewHolder>() {
 
     class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
@@ -466,19 +569,8 @@ class HistorialAdapter(
 
         // Listeners
         holder.btnVerDetalles.setOnClickListener { onItemClick(item) }
-
-        holder.btnVerMaps.setOnClickListener {
-            val intent = Intent(Intent.ACTION_VIEW, Uri.parse("geo:0,0?q=${item.direccion}"))
-            holder.itemView.context.startActivity(intent)
-        }
-
-        holder.btnCompartir.setOnClickListener {
-            val texto = "Cotización Mr. Persiana - ${item.nombreCliente}: $${String.format("%.2f", item.precio)}"
-            val intent = Intent(Intent.ACTION_SEND)
-            intent.type = "text/plain"
-            intent.putExtra(Intent.EXTRA_TEXT, texto)
-            holder.itemView.context.startActivity(Intent.createChooser(intent, "Compartir cotización"))
-        }
+        holder.btnVerMaps.setOnClickListener { onMapsClick(item) }
+        holder.btnCompartir.setOnClickListener { onCompartirClick(item) }
     }
 
     override fun getItemCount() = lista.size

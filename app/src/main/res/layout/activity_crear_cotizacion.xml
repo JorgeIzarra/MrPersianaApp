@@ -270,15 +270,6 @@
                 android:layout_marginBottom="12dp" />
 
             <Button
-                android:id="@+id/btnCompartirCotizacion"
-                style="@style/BotonSecundario"
-                android:layout_width="match_parent"
-                android:layout_height="48dp"
-                android:text="📤 COMPARTIR POR WHATSAPP"
-                android:textSize="16sp"
-                android:layout_marginBottom="12dp" />
-
-            <Button
                 android:id="@+id/btnLimpiarFormulario"
                 style="@style/BotonSecundario"
                 android:layout_width="match_parent"
@@ -301,7 +292,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="📱 Compartir Cotización:"
+                android:text="💾 Guardar Cotización:"
                 android:textSize="16sp"
                 android:textColor="@color/azul_oscuro"
                 android:textStyle="bold"
@@ -310,7 +301,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Puedes compartir esta cotización directamente por WhatsApp, email o cualquier app instalada. El cliente recibirá un resumen profesional con todos los detalles."
+                android:text="Al guardar verás el detalle completo de la cotización donde podrás compartirla directamente con el cliente por WhatsApp, email o cualquier app."
                 android:textSize="14sp"
                 android:textColor="@color/negro_texto"
                 android:lineSpacingExtra="2dp" />

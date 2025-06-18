@@ -5,6 +5,7 @@ import android.os.Bundle
 import android.view.View
 import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
+import java.util.Calendar
 
 class CrearCotizacionActivity : AppCompatActivity() {
 
@@ -19,7 +20,6 @@ class CrearCotizacionActivity : AppCompatActivity() {
     private lateinit var tvInstalacion: TextView
     private lateinit var tvTotal: TextView
     private lateinit var btnGuardarCotizacion: Button
-    private lateinit var btnCompartirCotizacion: Button
     private lateinit var btnLimpiarFormulario: Button
     private lateinit var btnVolver: Button
 
@@ -94,10 +94,8 @@ class CrearCotizacionActivity : AppCompatActivity() {
         tvInstalacion = findViewById(R.id.tvInstalacion)
         tvTotal = findViewById(R.id.tvTotal)
         btnGuardarCotizacion = findViewById(R.id.btnGuardarCotizacion)
-        btnCompartirCotizacion = findViewById(R.id.btnCompartirCotizacion)
         btnLimpiarFormulario = findViewById(R.id.btnLimpiarFormulario)
         btnVolver = findViewById(R.id.btnVolver)
-
 
         // Referencias a productos incluidos
         producto1 = findViewById(R.id.producto1)
@@ -299,9 +297,8 @@ class CrearCotizacionActivity : AppCompatActivity() {
             guardarCotizacion()
         }
 
-        btnCompartirCotizacion.setOnClickListener {
-            compartirCotizacion()
-        }
+        // REMOVIDO: btnCompartirCotizacion ya no se configura aquí
+        // La funcionalidad de compartir ahora está en DetalleActivity
 
         btnLimpiarFormulario.setOnClickListener {
             limpiarFormulario()
@@ -469,44 +466,13 @@ class CrearCotizacionActivity : AppCompatActivity() {
             return
         }
 
-        // TODO: Guardar en SQLite
+        // Mostrar mensaje de éxito
         val total = tvTotal.text.toString()
         val mensaje = "✅ Cotización guardada exitosamente!\n\nCliente: $nombreCliente\n$total"
         Toast.makeText(this, mensaje, Toast.LENGTH_LONG).show()
 
-        limpiarFormulario()
-    }
-
-    private fun compartirCotizacion() {
-        val nombreCliente = etNombreCliente.text.toString().trim()
-        val total = tvTotal.text.toString()
-
-        if (nombreCliente.isEmpty() || total.contains("$0.00")) {
-            Toast.makeText(this, "Complete la cotización antes de compartir", Toast.LENGTH_SHORT).show()
-            return
-        }
-
-        val textoCotizacion = """
-            🏠 COTIZACIÓN - MR. PERSIANA
-            
-            Cliente: $nombreCliente
-            
-            📊 Resumen:
-            ${tvSubtotal.text}
-            ${tvInstalacion.text}
-            ═══════════════════
-            ${tvTotal.text}
-            
-            📞 Contacto: Mr. Persiana
-            ✅ Cotización válida por 30 días
-        """.trimIndent()
-
-        val intent = Intent(Intent.ACTION_SEND)
-        intent.type = "text/plain"
-        intent.putExtra(Intent.EXTRA_TEXT, textoCotizacion)
-        intent.putExtra(Intent.EXTRA_SUBJECT, "Cotización Mr. Persiana - $nombreCliente")
-
-        startActivity(Intent.createChooser(intent, "Compartir cotización por:"))
+        // Navegar al detalle de la cotización
+        navegarADetalle(nombreCliente)
     }
 
     private fun limpiarFormulario() {
@@ -537,5 +503,164 @@ class CrearCotizacionActivity : AppCompatActivity() {
         val intent = Intent(this, MenuActivity::class.java)
         startActivity(intent)
         finish()
+    }
+
+    /**
+     * Navegar a DetalleActivity con los datos de la cotización
+     */
+    private fun navegarADetalle(nombreCliente: String) {
+        // Crear bundle con todos los datos de la cotización
+        val bundle = Bundle().apply {
+            putString("nombre_cliente", nombreCliente)
+            putString("fecha_creacion", obtenerFechaActual())
+            putString("estado", "ENVIADA")
+
+            // Información de cotización
+            val citaSeleccionada = spinnerCitaVinculada.selectedItem.toString()
+            putString("cita_vinculada", if (citaSeleccionada == "Sin cita vinculada") "Sin cita vinculada" else citaSeleccionada)
+
+            val ubicacion = when (rgUbicacionInstalacion.checkedRadioButtonId) {
+                R.id.rbAfueras -> "Afueras/Interior (+$25 traslado)"
+                else -> "En la ciudad (precio estándar)"
+            }
+            putString("ubicacion_instalacion", ubicacion)
+
+            val observaciones = etObservaciones.text.toString().trim()
+            putString("observaciones", observaciones.ifEmpty { "Sin observaciones" })
+
+            // Productos detallados
+            putString("productos_detalle", generarDetalleProductos())
+
+            // Totales
+            putString("subtotal", tvSubtotal.text.toString())
+            putString("instalacion", tvInstalacion.text.toString())
+            putString("total", tvTotal.text.toString())
+        }
+
+        // Crear intent para DetalleActivity
+        val intent = Intent(this, DetalleActivity::class.java)
+        intent.putExtra("tipo_detalle", "COTIZACION")
+        intent.putExtra("datos", bundle)
+
+        startActivity(intent)
+        finish()
+    }
+
+    /**
+     * Generar texto detallado de los productos con todas las especificaciones
+     */
+    private fun generarDetalleProductos(): String {
+        val productos = listOf(producto1, producto2, producto3, producto4)
+        val detalles = mutableListOf<String>()
+
+        productos.forEachIndexed { index, producto ->
+            if (producto.visibility == View.VISIBLE) {
+                val spinnerTipo = producto.findViewById<Spinner>(R.id.spinnerTipoProducto)
+                if (spinnerTipo.selectedItemPosition > 0) {
+                    val tipoProducto = spinnerTipo.selectedItem.toString()
+                    val etAncho = producto.findViewById<EditText>(R.id.etAncho)
+                    val etAlto = producto.findViewById<EditText>(R.id.etAlto)
+                    val tvCantidad = producto.findViewById<TextView>(R.id.tvCantidad)
+                    val tvPrecio = producto.findViewById<TextView>(R.id.tvPrecioProducto)
+
+                    val ancho = etAncho.text.toString()
+                    val alto = etAlto.text.toString()
+                    val cantidad = tvCantidad.text.toString()
+                    val precio = tvPrecio.text.toString()
+
+                    var detalle = "• Producto ${index + 1}: $tipoProducto\n" +
+                            "  📏 Dimensiones: ${ancho}m x ${alto}m\n" +
+                            "  📦 Cantidad: $cantidad unidades\n"
+
+                    // Agregar detalles específicos según el tipo
+                    if (tipoProducto == "Persianas") {
+                        // Obtener detalles de persiana
+                        val spinnerTipoPersiana = producto.findViewById<Spinner>(R.id.spinnerTipoPersiana)
+                        val spinnerColorPersiana = producto.findViewById<Spinner>(R.id.spinnerColorPersiana)
+                        val rgCenefa = producto.findViewById<RadioGroup>(R.id.rgCenefaPersiana)
+                        val rgAccionamiento = producto.findViewById<RadioGroup>(R.id.rgAccionamientoPersiana)
+
+                        if (spinnerTipoPersiana.selectedItemPosition > 0) {
+                            detalle += "  🏷️ Tipo: ${spinnerTipoPersiana.selectedItem}\n"
+                        }
+
+                        if (spinnerColorPersiana.selectedItemPosition > 0) {
+                            detalle += "  🎨 Color: ${spinnerColorPersiana.selectedItem}\n"
+                        }
+
+                        // Cenefa
+                        val cenefa = when (rgCenefa.checkedRadioButtonId) {
+                            R.id.rbConCenefa -> "✅ Con cenefa decorativa"
+                            R.id.rbSinCenefa -> "❌ Sin cenefa"
+                            else -> "Sin especificar"
+                        }
+                        detalle += "  🎀 Cenefa: $cenefa\n"
+
+                        // Accionamiento
+                        val accionamiento = when (rgAccionamiento.checkedRadioButtonId) {
+                            R.id.rbManualPersiana -> "🖐️ Manual (cadena/cordón)"
+                            R.id.rbMotorizadaPersiana -> "⚡ Motorizada (+40% precio)"
+                            else -> "Sin especificar"
+                        }
+                        detalle += "  🔧 Accionamiento: $accionamiento\n"
+
+                    } else if (tipoProducto == "Cortinas") {
+                        // Obtener detalles de cortina
+                        val spinnerTipoCortina = producto.findViewById<Spinner>(R.id.spinnerTipoCortina)
+                        val spinnerColorCortina = producto.findViewById<Spinner>(R.id.spinnerColorCortina)
+                        val rgApertura = producto.findViewById<RadioGroup>(R.id.rgAperturaCortina)
+                        val rgAccionamiento = producto.findViewById<RadioGroup>(R.id.rgAccionamientoCortina)
+
+                        if (spinnerTipoCortina.selectedItemPosition > 0) {
+                            detalle += "  🏷️ Tipo: ${spinnerTipoCortina.selectedItem}\n"
+                        }
+
+                        if (spinnerColorCortina.selectedItemPosition > 0) {
+                            detalle += "  🎨 Color: ${spinnerColorCortina.selectedItem}\n"
+                        }
+
+                        // Apertura
+                        val apertura = when (rgApertura.checkedRadioButtonId) {
+                            R.id.rbAperturaCentral -> "↔️ Apertura central (dos paños)"
+                            R.id.rbAperturaLateral -> "➡️ Apertura lateral (un paño)"
+                            else -> "Sin especificar"
+                        }
+                        detalle += "  📐 Apertura: $apertura\n"
+
+                        // Accionamiento
+                        val accionamiento = when (rgAccionamiento.checkedRadioButtonId) {
+                            R.id.rbManualCortina -> "🖐️ Manual (cordón/varilla)"
+                            R.id.rbMotorizadaCortina -> "⚡ Motorizada (+40% precio)"
+                            else -> "Sin especificar"
+                        }
+                        detalle += "  🔧 Accionamiento: $accionamiento\n"
+                    }
+
+                    // Agregar precio al final
+                    detalle += "  💰 $precio\n"
+
+                    detalles.add(detalle)
+                }
+            }
+        }
+
+        return if (detalles.isNotEmpty()) {
+            detalles.joinToString("\n")
+        } else {
+            "No hay productos registrados"
+        }
+    }
+
+    /**
+     * Obtener fecha actual formateada
+     */
+    private fun obtenerFechaActual(): String {
+        val calendar = Calendar.getInstance()
+        return String.format(
+            "%02d/%02d/%d",
+            calendar.get(Calendar.DAY_OF_MONTH),
+            calendar.get(Calendar.MONTH) + 1,
+            calendar.get(Calendar.YEAR)
+        )
     }
 }
