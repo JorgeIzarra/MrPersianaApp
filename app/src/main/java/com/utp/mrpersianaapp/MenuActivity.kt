@@ -1,6 +1,8 @@
 package com.utp.mrpersianaapp
 
+import android.content.Context
 import android.content.Intent
+import android.content.SharedPreferences
 import android.net.Uri
 import android.os.Bundle
 import android.widget.Button
@@ -19,20 +21,25 @@ class MenuActivity : AppCompatActivity() {
     private lateinit var btnCalendario: Button
     private lateinit var btnCerrarSesion: Button
 
-    // Datos del trabajador recibidos del Login
+    // SharedPreferences
+    private lateinit var prefs: SharedPreferences
+
+    // Datos del trabajador
     private var nombreTrabajador: String = ""
     private var cargoTrabajador: String = ""
-    private var trabajadorCompleto: String = ""
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_menu)
 
+        // Inicializar SharedPreferences
+        prefs = getSharedPreferences("MrPersianaPrefs", Context.MODE_PRIVATE)
+
         // Inicializar componentes
         initializeComponents()
 
-        // Recibir datos del LoginActivity
-        receiveWorkerData()
+        // Cargar datos del trabajador desde SharedPreferences
+        loadWorkerDataFromPreferences()
 
         // Configurar información del trabajador
         setupWorkerInfo()
@@ -55,13 +62,17 @@ class MenuActivity : AppCompatActivity() {
     }
 
     /**
-     * Recibir datos del trabajador desde LoginActivity
+     * Cargar datos del trabajador desde SharedPreferences
      */
-    private fun receiveWorkerData() {
-        // Recibir datos enviados por putExtra desde LoginActivity
-        nombreTrabajador = intent.getStringExtra("trabajador_nombre") ?: "Usuario"
-        cargoTrabajador = intent.getStringExtra("trabajador_cargo") ?: "Sin cargo"
-        trabajadorCompleto = intent.getStringExtra("trabajador_completo") ?: "Usuario - Sin cargo"
+    private fun loadWorkerDataFromPreferences() {
+        // Leer datos guardados en SharedPreferences
+        nombreTrabajador = prefs.getString("nombre_trabajador", "Usuario") ?: "Usuario"
+        cargoTrabajador = prefs.getString("cargo_trabajador", "Sin cargo") ?: "Sin cargo"
+
+        // Debug: Mostrar en consola que se cargaron los datos
+        println("📱 MenuActivity - Datos cargados desde SharedPreferences:")
+        println("   Nombre: $nombreTrabajador")
+        println("   Cargo: $cargoTrabajador")
     }
 
     /**
@@ -125,7 +136,13 @@ class MenuActivity : AppCompatActivity() {
      */
     private fun cerrarSesion() {
         // Mostrar mensaje de confirmación
-        Toast.makeText(this, "Sesión cerrada. ¡Hasta luego ${nombreTrabajador}!", Toast.LENGTH_SHORT).show()
+        Toast.makeText(this, "Sesión cerrada. ¡Hasta luego $nombreTrabajador!", Toast.LENGTH_SHORT).show()
+
+        // OPCIONAL: Limpiar algunos datos de sesión en SharedPreferences
+        // (pero mantenemos los datos del usuario para la próxima vez)
+        val editor = prefs.edit()
+        editor.putString("ultima_sesion", obtenerFechaHoraActual())
+        editor.apply()
 
         // Crear intent para volver al LoginActivity
         val intent = Intent(this, LoginActivity::class.java)
@@ -135,6 +152,21 @@ class MenuActivity : AppCompatActivity() {
 
         startActivity(intent)
         finish()
+    }
+
+    /**
+     * Obtener fecha y hora actual formateada
+     */
+    private fun obtenerFechaHoraActual(): String {
+        val calendar = java.util.Calendar.getInstance()
+        return String.format(
+            "%02d/%02d/%d %02d:%02d",
+            calendar.get(java.util.Calendar.DAY_OF_MONTH),
+            calendar.get(java.util.Calendar.MONTH) + 1,
+            calendar.get(java.util.Calendar.YEAR),
+            calendar.get(java.util.Calendar.HOUR_OF_DAY),
+            calendar.get(java.util.Calendar.MINUTE)
+        )
     }
 
 //    /**
