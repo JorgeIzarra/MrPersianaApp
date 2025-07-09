@@ -10,6 +10,14 @@
     <color name="gris_medio">#A0AEC0</color>
     <color name="gris_claro2">#F7FAFC</color>
 
+    <!-- NUEVOS: Colores específicos para mejorar contraste en DatePicker y TimePicker -->
+    <color name="picker_text_primary">#1A202C</color>        <!-- Texto principal de números - más oscuro -->
+    <color name="picker_text_secondary">#4A5568</color>      <!-- Texto secundario - gris oscuro -->
+    <color name="picker_accent">#4A90BD</color>              <!-- Color de selección - azul principal -->
+    <color name="picker_background">#FFFFFF</color>          <!-- Fondo de pickers -->
+
+    <!-- Para mejor contraste en pickers Material3 -->
+    <color name="gris_oscuro_contraste">#4A5568</color>     <!-- Gris oscuro para texto secundario -->
 
     <!-- Colores del sistema -->
     <color name="black">#FF000000</color>

@@ -14,6 +14,7 @@ import android.widget.EditText
 import android.widget.ScrollView
 import android.widget.Spinner
 import android.widget.Toast
+import android.view.ContextThemeWrapper
 import androidx.appcompat.app.AppCompatActivity
 import com.utp.mrpersianaapp.data.Cita
 import com.utp.mrpersianaapp.data.DatabaseHelper
@@ -133,7 +134,7 @@ class CrearCitaActivity : AppCompatActivity() {
     }
 
     /**
-     * Mostrar selector de fecha
+     * Mostrar selector de fecha CON TEMA MEJORADO
      */
     private fun showDatePicker() {
         val calendar = Calendar.getInstance()
@@ -142,7 +143,7 @@ class CrearCitaActivity : AppCompatActivity() {
         val day = calendar.get(Calendar.DAY_OF_MONTH)
 
         val datePickerDialog = DatePickerDialog(
-            this,
+            ContextThemeWrapper(this, R.style.PickerTheme), // ← USAR ContextThemeWrapper
             { _, selectedYear, selectedMonth, selectedDay ->
                 val formattedDate = String.format(
                     "%02d/%02d/%d",
@@ -155,13 +156,12 @@ class CrearCitaActivity : AppCompatActivity() {
             year, month, day
         )
 
-        // No permitir fechas pasadas
         datePickerDialog.datePicker.minDate = System.currentTimeMillis()
         datePickerDialog.show()
     }
 
     /**
-     * Mostrar selector de hora
+     * Mostrar selector de hora CON TEMA MEJORADO
      */
     private fun showTimePicker() {
         val calendar = Calendar.getInstance()
@@ -169,7 +169,7 @@ class CrearCitaActivity : AppCompatActivity() {
         val minute = calendar.get(Calendar.MINUTE)
 
         val timePickerDialog = TimePickerDialog(
-            this,
+            ContextThemeWrapper(this, R.style.PickerTheme), // ← USAR ContextThemeWrapper
             { _, selectedHour, selectedMinute ->
                 val amPm = if (selectedHour >= 12) "PM" else "AM"
                 val hour12 = if (selectedHour > 12) selectedHour - 12 else if (selectedHour == 0) 12 else selectedHour
@@ -182,7 +182,7 @@ class CrearCitaActivity : AppCompatActivity() {
                 )
                 etHoraVisita.setText(formattedTime)
             },
-            hour, minute, false // false para formato 12 horas
+            hour, minute, false
         )
 
         timePickerDialog.show()

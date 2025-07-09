@@ -39,4 +39,16 @@
         <item name="android:layout_margin">8dp</item>
         <item name="cornerRadius">8dp</item>
     </style>
+
+    <!-- NUEVO: Tema específico para DatePicker y TimePicker con mejor contraste -->
+    <style name="PickerTheme" parent="Theme.Material3.DayNight.Dialog">
+        <item name="colorPrimary">@color/azul_principal</item>
+        <item name="colorOnPrimary">@color/blanco</item>
+        <item name="colorSurface">@color/blanco</item>
+        <item name="colorOnSurface">@color/negro_texto</item>
+        <item name="colorOnSurfaceVariant">@color/azul_oscuro</item>
+        <item name="android:textColorPrimary">@color/blanco</item>
+        <item name="android:textColorSecondary">@color/gris_medio</item>
+    </style>
+
 </resources>
