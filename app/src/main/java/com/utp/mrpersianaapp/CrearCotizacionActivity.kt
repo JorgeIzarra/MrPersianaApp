@@ -5,6 +5,10 @@ import android.os.Bundle
 import android.view.View
 import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
+import com.utp.mrpersianaapp.data.Cita
+import com.utp.mrpersianaapp.data.Cotizacion
+import com.utp.mrpersianaapp.data.DatabaseHelper
+import com.utp.mrpersianaapp.data.Producto
 import java.util.Calendar
 
 class CrearCotizacionActivity : AppCompatActivity() {
@@ -29,9 +33,16 @@ class CrearCotizacionActivity : AppCompatActivity() {
     private lateinit var producto3: View
     private lateinit var producto4: View
 
+    // Base de datos
+    private lateinit var databaseHelper: DatabaseHelper
+
     // Control de productos activos
     private var productosActivos = 1
     private val maxProductos = 4
+
+    // Variables para citas disponibles
+    private var citasDisponibles = mutableListOf<Cita>()
+    private var citasParaSpinner = mutableListOf<String>()
 
     // Arrays para opciones de spinners
     private val tiposProducto = arrayOf(
@@ -64,18 +75,15 @@ class CrearCotizacionActivity : AppCompatActivity() {
         "Café"
     )
 
-    private val citasDisponibles = arrayOf(
-        "Sin cita vinculada",
-        "Wilcaris Zambrano - 30/06/2025",
-        "María García - 03/07/2025",
-        "Carlos López - 05/07/2025"
-    )
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_crear_cotizacion)
 
+        // Inicializar base de datos
+        databaseHelper = DatabaseHelper(this)
+
         initializeComponents()
+        cargarCitasDisponibles()
         setupSpinners()
         setupProductos()
         setupButtons()
@@ -104,18 +112,46 @@ class CrearCotizacionActivity : AppCompatActivity() {
         producto4 = findViewById(R.id.producto4)
     }
 
+    /**
+     * Cargar citas disponibles desde la base de datos
+     */
+    private fun cargarCitasDisponibles() {
+        try {
+            // Obtener todas las citas desde la BD
+            citasDisponibles = databaseHelper.obtenerTodasLasCitas().toMutableList()
+
+            // Crear lista para el spinner
+            citasParaSpinner.clear()
+            citasParaSpinner.add("Sin cita vinculada")
+
+            // Agregar citas con formato legible
+            citasDisponibles.forEach { cita ->
+                val formatoCita = "${cita.nombreCliente} - ${cita.fechaVisita}"
+                citasParaSpinner.add(formatoCita)
+            }
+
+            println("📋 Citas cargadas para spinner: ${citasParaSpinner.size}")
+
+        } catch (e: Exception) {
+            println("❌ Error al cargar citas: ${e.message}")
+            // Fallback en caso de error
+            citasParaSpinner.clear()
+            citasParaSpinner.add("Sin cita vinculada")
+        }
+    }
+
     private fun setupSpinners() {
-        // Spinner de citas vinculadas
-        val adapterCitas = ArrayAdapter(this, android.R.layout.simple_spinner_item, citasDisponibles)
+        // Spinner de citas vinculadas con datos reales
+        val adapterCitas = ArrayAdapter(this, android.R.layout.simple_spinner_item, citasParaSpinner)
         adapterCitas.setDropDownViewResource(R.layout.spinner_dropdown_item)
         spinnerCitaVinculada.adapter = adapterCitas
 
         spinnerCitaVinculada.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
             override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
                 if (position > 0) {
-                    // Auto-llenar nombre del cliente desde la cita
-                    val nombreCliente = citasDisponibles[position].split(" - ")[0]
-                    etNombreCliente.setText(nombreCliente)
+                    // Auto-llenar nombre del cliente desde la cita seleccionada
+                    val citaSeleccionada = citasDisponibles[position - 1]
+                    etNombreCliente.setText(citaSeleccionada.nombreCliente)
                 }
                 (view as? TextView)?.setTextColor(resources.getColor(R.color.negro_texto, null))
             }
@@ -297,9 +333,6 @@ class CrearCotizacionActivity : AppCompatActivity() {
             guardarCotizacion()
         }
 
-        // REMOVIDO: btnCompartirCotizacion ya no se configura aquí
-        // La funcionalidad de compartir ahora está en DetalleActivity
-
         btnLimpiarFormulario.setOnClickListener {
             limpiarFormulario()
         }
@@ -452,9 +485,13 @@ class CrearCotizacionActivity : AppCompatActivity() {
         return precioBase * cantidad
     }
 
+    /**
+     * MÉTODO PRINCIPAL: Guardar cotización con productos en la base de datos
+     */
     private fun guardarCotizacion() {
         val nombreCliente = etNombreCliente.text.toString().trim()
 
+        // Validar campos básicos
         if (nombreCliente.isEmpty()) {
             etNombreCliente.error = "El nombre del cliente es obligatorio"
             etNombreCliente.requestFocus()
@@ -466,13 +503,285 @@ class CrearCotizacionActivity : AppCompatActivity() {
             return
         }
 
-        // Mostrar mensaje de éxito
-        val total = tvTotal.text.toString()
-        val mensaje = "✅ Cotización guardada exitosamente!\n\nCliente: $nombreCliente\n$total"
-        Toast.makeText(this, mensaje, Toast.LENGTH_LONG).show()
+        try {
+            // 1. Obtener datos de la cotización
+            val citaVinculadaId = if (spinnerCitaVinculada.selectedItemPosition > 0) {
+                citasDisponibles[spinnerCitaVinculada.selectedItemPosition - 1].id
+            } else null
 
-        // Navegar al detalle de la cotización
-        navegarADetalle(nombreCliente)
+            val ubicacion = when (rgUbicacionInstalacion.checkedRadioButtonId) {
+                R.id.rbAfueras -> Cotizacion.UBICACION_AFUERAS
+                else -> Cotizacion.UBICACION_CIUDAD
+            }
+
+            val observaciones = etObservaciones.text.toString().trim()
+            val subtotal = extraerNumeroDelTexto(tvSubtotal.text.toString())
+            val costoInstalacion = extraerNumeroDelTexto(tvInstalacion.text.toString())
+            val total = extraerNumeroDelTexto(tvTotal.text.toString())
+
+            // 2. Crear objeto Cotización
+            val cotizacion = Cotizacion(
+                citaId = citaVinculadaId,
+                nombreCliente = nombreCliente,
+                ubicacionInstalacion = ubicacion,
+                observaciones = observaciones.ifEmpty { null },
+                subtotal = subtotal,
+                costoInstalacion = costoInstalacion,
+                total = total,
+                estado = Cotizacion.ESTADO_ENVIADA,
+                fechaCreacion = obtenerFechaActual()
+            )
+
+            // 3. Guardar cotización en BD
+            val cotizacionId = databaseHelper.insertarCotizacion(cotizacion)
+
+            if (cotizacionId > 0) {
+                println("📋 Cotización guardada con ID: $cotizacionId")
+
+                // 4. Extraer y guardar productos
+                val productosGuardados = guardarProductosDeLaUI(cotizacionId)
+
+                if (productosGuardados > 0) {
+                    // 5. Actualizar estado de cita vinculada si existe
+                    citaVinculadaId?.let { citaId ->
+                        databaseHelper.actualizarEstadoCita(citaId, Cita.ESTADO_COTIZADA)
+                        println("📅 Cita $citaId actualizada a COTIZADA")
+                    }
+
+                    // 6. Mostrar mensaje de éxito
+                    val mensaje = "✅ Cotización guardada exitosamente!\n\n" +
+                            "Cliente: $nombreCliente\n" +
+                            "Productos: $productosGuardados\n" +
+                            "Total: $${String.format("%.2f", total)}"
+
+                    Toast.makeText(this, mensaje, Toast.LENGTH_LONG).show()
+
+                    // 7. Navegar al detalle
+                    navegarADetalleCotizacion(cotizacionId)
+
+                } else {
+                    Toast.makeText(this, "❌ Error al guardar productos", Toast.LENGTH_SHORT).show()
+                }
+            } else {
+                Toast.makeText(this, "❌ Error al guardar cotización", Toast.LENGTH_SHORT).show()
+            }
+
+        } catch (e: Exception) {
+            println("❌ Error al guardar cotización: ${e.message}")
+            Toast.makeText(this, "❌ Error inesperado: ${e.message}", Toast.LENGTH_LONG).show()
+        }
+    }
+
+    /**
+     * Extraer y guardar todos los productos de la interfaz
+     */
+    private fun guardarProductosDeLaUI(cotizacionId: Long): Int {
+        val productos = listOf(producto1, producto2, producto3, producto4)
+        var productosGuardados = 0
+
+        productos.forEach { productoView ->
+            if (productoView.visibility == View.VISIBLE) {
+                val producto = extraerProductoDeUI(productoView, cotizacionId)
+                if (producto != null) {
+                    val productoId = databaseHelper.insertarProducto(producto)
+                    if (productoId > 0) {
+                        productosGuardados++
+                        println("🏷️ Producto guardado: ${producto.tipoProducto} - ${producto.getDimensionesFormateadas()}")
+                    }
+                }
+            }
+        }
+
+        return productosGuardados
+    }
+
+    /**
+     * Extraer datos de un producto de la UI y crear objeto Producto
+     */
+    private fun extraerProductoDeUI(productoView: View, cotizacionId: Long): Producto? {
+        try {
+            val spinnerTipo = productoView.findViewById<Spinner>(R.id.spinnerTipoProducto)
+            if (spinnerTipo.selectedItemPosition == 0) return null
+
+            val tipoProducto = spinnerTipo.selectedItem.toString()
+            val etAncho = productoView.findViewById<EditText>(R.id.etAncho)
+            val etAlto = productoView.findViewById<EditText>(R.id.etAlto)
+            val tvCantidad = productoView.findViewById<TextView>(R.id.tvCantidad)
+
+            val ancho = etAncho.text.toString().toDoubleOrNull() ?: return null
+            val alto = etAlto.text.toString().toDoubleOrNull() ?: return null
+            val cantidad = tvCantidad.text.toString().toIntOrNull() ?: return null
+
+            if (ancho <= 0 || alto <= 0 || cantidad <= 0) return null
+
+            // Extraer detalles específicos según tipo
+            var subtipo: String? = null
+            var color: String? = null
+            var tieneCenefa = false
+            var esMotorizada = false
+            var aperturaCentral = true
+
+            if (tipoProducto == "Persianas") {
+                val spinnerTipoPersiana = productoView.findViewById<Spinner>(R.id.spinnerTipoPersiana)
+                val spinnerColorPersiana = productoView.findViewById<Spinner>(R.id.spinnerColorPersiana)
+                val rgCenefa = productoView.findViewById<RadioGroup>(R.id.rgCenefaPersiana)
+                val rgAccionamiento = productoView.findViewById<RadioGroup>(R.id.rgAccionamientoPersiana)
+
+                if (spinnerTipoPersiana.selectedItemPosition > 0) {
+                    subtipo = spinnerTipoPersiana.selectedItem.toString()
+                }
+                if (spinnerColorPersiana.selectedItemPosition > 0) {
+                    color = spinnerColorPersiana.selectedItem.toString()
+                }
+                tieneCenefa = rgCenefa.checkedRadioButtonId == R.id.rbConCenefa
+                esMotorizada = rgAccionamiento.checkedRadioButtonId == R.id.rbMotorizadaPersiana
+
+            } else if (tipoProducto == "Cortinas") {
+                val spinnerTipoCortina = productoView.findViewById<Spinner>(R.id.spinnerTipoCortina)
+                val spinnerColorCortina = productoView.findViewById<Spinner>(R.id.spinnerColorCortina)
+                val rgApertura = productoView.findViewById<RadioGroup>(R.id.rgAperturaCortina)
+                val rgAccionamiento = productoView.findViewById<RadioGroup>(R.id.rgAccionamientoCortina)
+
+                if (spinnerTipoCortina.selectedItemPosition > 0) {
+                    subtipo = spinnerTipoCortina.selectedItem.toString()
+                }
+                if (spinnerColorCortina.selectedItemPosition > 0) {
+                    color = spinnerColorCortina.selectedItem.toString()
+                }
+                aperturaCentral = rgApertura.checkedRadioButtonId == R.id.rbAperturaCentral
+                esMotorizada = rgAccionamiento.checkedRadioButtonId == R.id.rbMotorizadaCortina
+            }
+
+            // Calcular precios
+            val area = ancho * alto
+            val precioUnitario = when (tipoProducto) {
+                "Persianas" -> {
+                    var precio = area * 45.0
+                    if (esMotorizada) precio *= 1.4
+                    precio
+                }
+                "Cortinas" -> {
+                    var precio = area * 35.0
+                    if (esMotorizada) precio *= 1.4
+                    precio
+                }
+                else -> 0.0
+            }
+            val precioTotal = precioUnitario * cantidad
+
+            return Producto(
+                cotizacionId = cotizacionId,
+                tipoProducto = tipoProducto,
+                subtipo = subtipo,
+                color = color,
+                ancho = ancho,
+                alto = alto,
+                cantidad = cantidad,
+                precioUnitario = precioUnitario,
+                precioTotal = precioTotal,
+                tieneCenefa = tieneCenefa,
+                esMotorizada = esMotorizada,
+                aperturaCentral = aperturaCentral,
+                fechaCreacion = obtenerFechaActual()
+            )
+
+        } catch (e: Exception) {
+            println("❌ Error al extraer producto: ${e.message}")
+            return null
+        }
+    }
+
+    /**
+     * Navegar a DetalleActivity con los datos de la cotización guardada
+     */
+    private fun navegarADetalleCotizacion(cotizacionId: Long) {
+        try {
+            // Obtener la cotización completa desde BD
+            val cotizaciones = databaseHelper.obtenerTodasLasCotizaciones()
+            val cotizacion = cotizaciones.find { it.id == cotizacionId }
+
+            if (cotizacion != null) {
+                // Crear bundle con todos los datos
+                val bundle = Bundle().apply {
+                    putString("nombre_cliente", cotizacion.nombreCliente)
+                    putString("fecha_creacion", cotizacion.fechaCreacion)
+                    putString("estado", cotizacion.estado)
+
+                    // Información de cotización
+                    val citaVinculada = if (cotizacion.citaId != null) {
+                        val cita = databaseHelper.obtenerCitaPorId(cotizacion.citaId!!)
+                        "${cita?.nombreCliente} - ${cita?.fechaVisita}"
+                    } else "Sin cita vinculada"
+
+                    putString("cita_vinculada", citaVinculada)
+                    putString("ubicacion_instalacion", cotizacion.ubicacionInstalacion)
+                    putString("observaciones", cotizacion.observaciones ?: "Sin observaciones")
+
+                    // Productos detallados
+                    putString("productos_detalle", generarDetalleProductosParaBD(cotizacion.productos))
+
+                    // Totales
+                    putString("subtotal", cotizacion.getSubtotalFormateado())
+                    putString("instalacion", cotizacion.getCostoInstalacionFormateado())
+                    putString("total", cotizacion.getTotalFormateado())
+                }
+
+                val intent = Intent(this, DetalleActivity::class.java)
+                intent.putExtra("tipo_detalle", "COTIZACION")
+                intent.putExtra("datos", bundle)
+
+                startActivity(intent)
+                finish()
+            }
+        } catch (e: Exception) {
+            println("❌ Error al navegar al detalle: ${e.message}")
+            // Si hay error, volver al menú
+            volverAlMenu()
+        }
+    }
+
+    /**
+     * Generar texto detallado de productos desde la BD
+     */
+    private fun generarDetalleProductosParaBD(productos: List<Producto>): String {
+        if (productos.isEmpty()) return "No hay productos registrados"
+
+        val detalles = mutableListOf<String>()
+
+        productos.forEachIndexed { index, producto ->
+            var detalle = "• Producto ${index + 1}: ${producto.tipoProducto}\n" +
+                    "  📏 Dimensiones: ${producto.getDimensionesFormateadas()}\n" +
+                    "  📦 Cantidad: ${producto.cantidad} unidades\n"
+
+            // Agregar detalles específicos
+            producto.subtipo?.let { detalle += "  🏷️ Tipo: $it\n" }
+            producto.color?.let { detalle += "  🎨 Color: $it\n" }
+
+            if (producto.esPersiana()) {
+                detalle += "  🎀 Cenefa: ${producto.getDescripcionCenefa()}\n"
+            } else if (producto.esCortina()) {
+                detalle += "  📐 Apertura: ${producto.getDescripcionApertura()}\n"
+            }
+
+            detalle += "  🔧 Accionamiento: ${producto.getDescripcionAccionamiento()}\n"
+            detalle += "  💰 ${producto.getPrecioTotalFormateado()}\n"
+
+            detalles.add(detalle)
+        }
+
+        return detalles.joinToString("\n")
+    }
+
+    /**
+     * Extraer número de un texto como "Total: $450.00"
+     */
+    private fun extraerNumeroDelTexto(texto: String): Double {
+        return try {
+            val numero = texto.replace(Regex("[^0-9.]"), "")
+            numero.toDoubleOrNull() ?: 0.0
+        } catch (e: Exception) {
+            0.0
+        }
     }
 
     private fun limpiarFormulario() {
@@ -506,48 +815,7 @@ class CrearCotizacionActivity : AppCompatActivity() {
     }
 
     /**
-     * Navegar a DetalleActivity con los datos de la cotización
-     */
-    private fun navegarADetalle(nombreCliente: String) {
-        // Crear bundle con todos los datos de la cotización
-        val bundle = Bundle().apply {
-            putString("nombre_cliente", nombreCliente)
-            putString("fecha_creacion", obtenerFechaActual())
-            putString("estado", "ENVIADA")
-
-            // Información de cotización
-            val citaSeleccionada = spinnerCitaVinculada.selectedItem.toString()
-            putString("cita_vinculada", if (citaSeleccionada == "Sin cita vinculada") "Sin cita vinculada" else citaSeleccionada)
-
-            val ubicacion = when (rgUbicacionInstalacion.checkedRadioButtonId) {
-                R.id.rbAfueras -> "Afueras/Interior (+$25 traslado)"
-                else -> "En la ciudad (precio estándar)"
-            }
-            putString("ubicacion_instalacion", ubicacion)
-
-            val observaciones = etObservaciones.text.toString().trim()
-            putString("observaciones", observaciones.ifEmpty { "Sin observaciones" })
-
-            // Productos detallados
-            putString("productos_detalle", generarDetalleProductos())
-
-            // Totales
-            putString("subtotal", tvSubtotal.text.toString())
-            putString("instalacion", tvInstalacion.text.toString())
-            putString("total", tvTotal.text.toString())
-        }
-
-        // Crear intent para DetalleActivity
-        val intent = Intent(this, DetalleActivity::class.java)
-        intent.putExtra("tipo_detalle", "COTIZACION")
-        intent.putExtra("datos", bundle)
-
-        startActivity(intent)
-        finish()
-    }
-
-    /**
-     * Generar texto detallado de los productos con todas las especificaciones
+     * Generar texto detallado de los productos con todas las especificaciones (MÉTODO HEREDADO PARA COMPATIBILIDAD)
      */
     private fun generarDetalleProductos(): String {
         val productos = listOf(producto1, producto2, producto3, producto4)

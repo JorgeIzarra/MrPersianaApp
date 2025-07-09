@@ -10,6 +10,9 @@ import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.utp.mrpersianaapp.data.Cita
+import com.utp.mrpersianaapp.data.Cotizacion
+import com.utp.mrpersianaapp.data.DatabaseHelper
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -34,6 +37,9 @@ class ListaUnificadaActivity : AppCompatActivity() {
     private lateinit var btnNuevaCotizacion: Button
     private lateinit var btnVolver: Button
 
+    // Base de datos
+    private lateinit var databaseHelper: DatabaseHelper
+
     // Variables de control
     private var filtrosVisibles = false
     private lateinit var adapter: HistorialAdapter
@@ -51,14 +57,17 @@ class ListaUnificadaActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_lista_unificada)
 
+        // Inicializar base de datos
+        databaseHelper = DatabaseHelper(this)
+
         initializeComponents()
         setupSpinners()
         setupRecyclerView()
         setupButtons()
         setupFilters()
 
-        // Cargar datos de ejemplo
-        cargarDatosEjemplo()
+        // Cargar datos reales de la base de datos
+        cargarDatosRealesDesdeDB()
         aplicarFiltros()
     }
 
@@ -169,6 +178,148 @@ class ListaUnificadaActivity : AppCompatActivity() {
         })
     }
 
+    /**
+     * MÉTODO PRINCIPAL: Cargar datos reales desde la base de datos
+     */
+    private fun cargarDatosRealesDesdeDB() {
+        try {
+            listaCompleta.clear()
+
+            // 1. Cargar todas las citas desde la BD
+            val citas = databaseHelper.obtenerTodasLasCitas()
+            println("📅 Citas cargadas desde BD: ${citas.size}")
+
+            citas.forEach { cita ->
+                val itemCita = ItemHistorial(
+                    tipo = TipoItem.CITA,
+                    nombreCliente = cita.nombreCliente,
+                    fecha = cita.fechaCreacion,
+                    hora = cita.horaVisita,
+                    estado = cita.estado,
+                    direccion = cita.direccion,
+                    tipoProducto = cita.tipoConsulta,
+                    // Campos específicos de cita
+                    telefono = cita.telefono,
+                    fechaVisita = cita.fechaVisita,
+                    notasAdicionales = cita.notasAdicionales,
+                    // ID para referencia
+                    citaId = cita.id
+                )
+                listaCompleta.add(itemCita)
+            }
+
+            // 2. Cargar todas las cotizaciones desde la BD
+            val cotizaciones = databaseHelper.obtenerTodasLasCotizaciones()
+            println("📋 Cotizaciones cargadas desde BD: ${cotizaciones.size}")
+
+            cotizaciones.forEach { cotizacion ->
+                val itemCotizacion = ItemHistorial(
+                    tipo = TipoItem.COTIZACION,
+                    nombreCliente = cotizacion.nombreCliente,
+                    fecha = cotizacion.fechaCreacion,
+                    hora = "Cotización",
+                    estado = cotizacion.estado,
+                    precio = cotizacion.total,
+                    tipoProducto = obtenerTipoProductosDeCotizacion(cotizacion),
+                    // Campos específicos de cotización
+                    citaVinculada = obtenerCitaVinculadaTexto(cotizacion.citaId),
+                    ubicacionInstalacion = cotizacion.ubicacionInstalacion,
+                    observaciones = cotizacion.observaciones,
+                    productosDetalle = generarDetalleProductos(cotizacion),
+                    subtotal = cotizacion.subtotal,
+                    costoInstalacion = cotizacion.costoInstalacion,
+                    // ID para referencia
+                    cotizacionId = cotizacion.id
+                )
+                listaCompleta.add(itemCotizacion)
+            }
+
+            // 3. Ordenar por fecha más reciente
+            listaCompleta.sortByDescending { parseDate(it.fecha) }
+
+            println("📊 Total elementos cargados: ${listaCompleta.size} (${citas.size} citas + ${cotizaciones.size} cotizaciones)")
+
+        } catch (e: Exception) {
+            println("❌ Error al cargar datos desde BD: ${e.message}")
+            // En caso de error, mantener lista vacía
+            listaCompleta.clear()
+            Toast.makeText(this, "Error al cargar datos: ${e.message}", Toast.LENGTH_SHORT).show()
+        }
+    }
+
+    /**
+     * Obtener tipo de productos de una cotización
+     */
+    private fun obtenerTipoProductosDeCotizacion(cotizacion: Cotizacion): String {
+        if (cotizacion.productos.isEmpty()) return "Sin productos"
+
+        val tipos = cotizacion.productos.map { it.tipoProducto }.distinct()
+        return when {
+            tipos.size == 1 -> tipos.first()
+            tipos.contains("Persianas") && tipos.contains("Cortinas") -> "Persianas y Cortinas"
+            else -> tipos.joinToString(", ")
+        }
+    }
+
+    /**
+     * Obtener texto de cita vinculada
+     */
+    private fun obtenerCitaVinculadaTexto(citaId: Long?): String {
+        return if (citaId != null) {
+            try {
+                val cita = databaseHelper.obtenerCitaPorId(citaId)
+                "${cita?.nombreCliente} - ${cita?.fechaVisita}"
+            } catch (e: Exception) {
+                "Cita vinculada (ID: $citaId)"
+            }
+        } else {
+            "Sin cita vinculada"
+        }
+    }
+
+    /**
+     * Generar detalle de productos para cotización
+     */
+    private fun generarDetalleProductos(cotizacion: Cotizacion): String {
+        if (cotizacion.productos.isEmpty()) return "No hay productos registrados"
+
+        val detalles = mutableListOf<String>()
+
+        cotizacion.productos.forEachIndexed { index, producto ->
+            var detalle = "• Producto ${index + 1}: ${producto.tipoProducto}\n" +
+                    "  📏 Dimensiones: ${producto.getDimensionesFormateadas()}\n" +
+                    "  📦 Cantidad: ${producto.cantidad} unidades\n"
+
+            producto.subtipo?.let { detalle += "  🏷️ Tipo: $it\n" }
+            producto.color?.let { detalle += "  🎨 Color: $it\n" }
+
+            if (producto.esPersiana()) {
+                detalle += "  🎀 Cenefa: ${producto.getDescripcionCenefa()}\n"
+            } else if (producto.esCortina()) {
+                detalle += "  📐 Apertura: ${producto.getDescripcionApertura()}\n"
+            }
+
+            detalle += "  🔧 Accionamiento: ${producto.getDescripcionAccionamiento()}\n"
+            detalle += "  💰 ${producto.getPrecioTotalFormateado()}\n"
+
+            detalles.add(detalle)
+        }
+
+        return detalles.joinToString("\n")
+    }
+
+    /**
+     * Parsear fecha para ordenamiento
+     */
+    private fun parseDate(fechaStr: String): Date {
+        return try {
+            val format = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
+            format.parse(fechaStr) ?: Date()
+        } catch (e: Exception) {
+            Date()
+        }
+    }
+
     private fun toggleFiltros() {
         if (filtrosVisibles) {
             // Ocultar filtros
@@ -256,16 +407,18 @@ class ListaUnificadaActivity : AppCompatActivity() {
 
                 listaFiltrada.clear()
                 listaFiltrada.addAll(listaCompleta.filter {
-                    it.fecha.startsWith(fechaHoyStr.substring(0, 5)) // Aproximación
+                    it.fecha.startsWith(fechaHoyStr.substring(0, 5)) // Aproximación por día/mes
                 })
             }
             "semana" -> {
-                // Filtrar elementos de esta semana (simplificado)
+                // Filtrar elementos de esta semana
                 calendar.add(Calendar.DAY_OF_YEAR, -7)
                 val fechaSemana = calendar.time
 
                 listaFiltrada.clear()
-                listaFiltrada.addAll(listaCompleta) // Simplificado para el ejemplo
+                listaFiltrada.addAll(listaCompleta.filter {
+                    parseDate(it.fecha).after(fechaSemana)
+                })
             }
         }
 
@@ -298,8 +451,8 @@ class ListaUnificadaActivity : AppCompatActivity() {
 
     private fun ordenarLista(opcion: Int) {
         when (opcion) {
-            0 -> listaFiltrada.sortByDescending { it.fecha }
-            1 -> listaFiltrada.sortBy { it.fecha }
+            0 -> listaFiltrada.sortByDescending { parseDate(it.fecha) }
+            1 -> listaFiltrada.sortBy { parseDate(it.fecha) }
             2 -> listaFiltrada.sortBy { it.nombreCliente }
             3 -> listaFiltrada.sortByDescending { it.nombreCliente }
         }
@@ -333,22 +486,42 @@ class ListaUnificadaActivity : AppCompatActivity() {
             putString("estado", item.estado)
 
             if (item.tipo == TipoItem.CITA) {
-                // Datos específicos de cita
-                putString("telefono", item.telefono ?: "Sin teléfono")
-                putString("direccion", item.direccion)
-                putString("fecha_visita", item.fechaVisita ?: item.fecha)
-                putString("hora_visita", item.hora)
-                putString("tipo_consulta", item.tipoProducto)
-                putString("notas_adicionales", item.notasAdicionales ?: "Sin notas adicionales")
+                // Datos específicos de cita - cargar datos reales de BD
+                item.citaId?.let { citaId ->
+                    try {
+                        val cita = databaseHelper.obtenerCitaPorId(citaId)
+                        if (cita != null) {
+                            putString("telefono", cita.telefono)
+                            putString("direccion", cita.direccion)
+                            putString("fecha_visita", cita.fechaVisita)
+                            putString("hora_visita", cita.horaVisita)
+                            putString("tipo_consulta", cita.tipoConsulta)
+                            putString("notas_adicionales", cita.notasAdicionales ?: "Sin notas adicionales")
+                        }
+                    } catch (e: Exception) {
+                        println("❌ Error al cargar cita: ${e.message}")
+                    }
+                }
             } else {
-                // Datos específicos de cotización
-                putString("cita_vinculada", item.citaVinculada ?: "Sin cita vinculada")
-                putString("ubicacion_instalacion", item.ubicacionInstalacion ?: "En la ciudad")
-                putString("observaciones", item.observaciones ?: "Sin observaciones")
-                putString("productos_detalle", item.productosDetalle ?: "No hay productos registrados")
-                putString("subtotal", "Subtotal: $${String.format("%.2f", item.subtotal ?: 0.0)}")
-                putString("instalacion", "Instalación: $${String.format("%.2f", item.costoInstalacion ?: 0.0)}")
-                putString("total", "TOTAL: $${String.format("%.2f", item.precio)}")
+                // Datos específicos de cotización - cargar datos reales de BD
+                item.cotizacionId?.let { cotizacionId ->
+                    try {
+                        val cotizaciones = databaseHelper.obtenerTodasLasCotizaciones()
+                        val cotizacion = cotizaciones.find { it.id == cotizacionId }
+
+                        if (cotizacion != null) {
+                            putString("cita_vinculada", item.citaVinculada ?: "Sin cita vinculada")
+                            putString("ubicacion_instalacion", cotizacion.ubicacionInstalacion)
+                            putString("observaciones", cotizacion.observaciones ?: "Sin observaciones")
+                            putString("productos_detalle", item.productosDetalle ?: "No hay productos registrados")
+                            putString("subtotal", cotizacion.getSubtotalFormateado())
+                            putString("instalacion", cotizacion.getCostoInstalacionFormateado())
+                            putString("total", cotizacion.getTotalFormateado())
+                        }
+                    } catch (e: Exception) {
+                        println("❌ Error al cargar cotización: ${e.message}")
+                    }
+                }
             }
         }
 
@@ -403,84 +576,20 @@ class ListaUnificadaActivity : AppCompatActivity() {
         startActivity(Intent.createChooser(intent, "Compartir por:"))
     }
 
-    private fun cargarDatosEjemplo() {
-        // Datos de ejemplo para testing
-        listaCompleta.addAll(listOf(
-            ItemHistorial(
-                tipo = TipoItem.CITA,
-                nombreCliente = "Juan Pérez",
-                fecha = "15/06/2025",
-                hora = "10:30 AM",
-                estado = "PENDIENTE",
-                direccion = "Calle 50, Casa 123, San Francisco",
-                tipoProducto = "Persianas",
-                telefono = "6123-4567",
-                fechaVisita = "20/06/2025",
-                notasAdicionales = "Cliente prefiere colores neutros"
-            ),
-            ItemHistorial(
-                tipo = TipoItem.COTIZACION,
-                nombreCliente = "María García",
-                fecha = "14/06/2025",
-                hora = "14:00 PM",
-                estado = "ENVIADA",
-                precio = 450.0,
-                tipoProducto = "Cortinas",
-                citaVinculada = "María García - 03/07/2025",
-                ubicacionInstalacion = "En la ciudad",
-                observaciones = "Instalación en horario matutino",
-                productosDetalle = """• Producto 1: Cortinas
-  📏 Dimensiones: 3.0m x 2.0m
-  📦 Cantidad: 2 unidades
-  🏷️ Tipo: Blackout
-  🎨 Color: Gris Oscuro
-  📐 Apertura: ↔️ Apertura central (dos paños)
-  🔧 Accionamiento: 🖐️ Manual (cordón/varilla)
-  💰 Precio: $420.00""",
-                subtotal = 420.0,
-                costoInstalacion = 0.0
-            ),
-            ItemHistorial(
-                tipo = TipoItem.CITA,
-                nombreCliente = "Carlos López",
-                fecha = "16/06/2025",
-                hora = "09:00 AM",
-                estado = "COMPLETADA",
-                direccion = "Avenida Balboa, Edificio Plaza, Apt 505",
-                tipoProducto = "Persianas y Cortinas",
-                telefono = "6987-6543",
-                fechaVisita = "16/06/2025",
-                notasAdicionales = "Medición realizada, cliente solicita presupuesto urgente"
-            ),
-            ItemHistorial(
-                tipo = TipoItem.COTIZACION,
-                nombreCliente = "Ana Rodríguez",
-                fecha = "13/06/2025",
-                hora = "16:30 PM",
-                estado = "CERRADA",
-                precio = 320.0,
-                tipoProducto = "Persianas",
-                citaVinculada = "Sin cita vinculada",
-                ubicacionInstalacion = "Afueras/Interior (+$25 traslado)",
-                observaciones = "Cliente aprobó el proyecto",
-                productosDetalle = """• Producto 1: Persianas
-  📏 Dimensiones: 2.5m x 1.8m
-  📦 Cantidad: 1 unidades
-  🏷️ Tipo: Screen
-  🎨 Color: Blanco
-  🎀 Cenefa: ❌ Sin cenefa
-  🔧 Accionamiento: 🖐️ Manual (cadena/cordón)
-  💰 Precio: $202.50""",
-                subtotal = 202.5,
-                costoInstalacion = 25.0
-            )
-        ))
-    }
-
     private fun volverAlMenu() {
         val intent = Intent(this, MenuActivity::class.java)
         startActivity(intent)
         finish()
+    }
+
+    /**
+     * Recargar datos cuando se vuelve a la actividad
+     */
+    override fun onResume() {
+        super.onResume()
+        // Recargar datos por si se agregaron nuevas citas/cotizaciones
+        cargarDatosRealesDesdeDB()
+        aplicarFiltros()
     }
 }
 
@@ -509,7 +618,10 @@ data class ItemHistorial(
     val observaciones: String? = null,
     val productosDetalle: String? = null,
     val subtotal: Double? = null,
-    val costoInstalacion: Double? = null
+    val costoInstalacion: Double? = null,
+    // IDs para referencia a BD
+    val citaId: Long? = null,
+    val cotizacionId: Long? = null
 )
 
 // Adapter mejorado para RecyclerView

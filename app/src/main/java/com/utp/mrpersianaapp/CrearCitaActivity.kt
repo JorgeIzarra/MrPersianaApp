@@ -15,6 +15,8 @@ import android.widget.ScrollView
 import android.widget.Spinner
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import com.utp.mrpersianaapp.data.Cita
+import com.utp.mrpersianaapp.data.DatabaseHelper
 import java.util.Calendar
 
 class CrearCitaActivity : AppCompatActivity() {
@@ -32,6 +34,9 @@ class CrearCitaActivity : AppCompatActivity() {
     private lateinit var btnLimpiarFormulario: Button
     private lateinit var btnVolver: Button
 
+    // Base de datos
+    private lateinit var databaseHelper: DatabaseHelper
+
     // Opciones para el spinner de tipo de consulta
     private val tiposConsulta = arrayOf(
         "Selecciona el tipo de consulta...",
@@ -48,6 +53,9 @@ class CrearCitaActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_crear_cita)
+
+        // Inicializar base de datos
+        databaseHelper = DatabaseHelper(this)
 
         // Inicializar componentes
         initializeComponents()
@@ -198,7 +206,7 @@ class CrearCitaActivity : AppCompatActivity() {
     }
 
     /**
-     * Validar y guardar la cita
+     * Validar y guardar la cita en la base de datos
      */
     private fun guardarCita() {
         // Obtener datos del formulario
@@ -214,21 +222,87 @@ class CrearCitaActivity : AppCompatActivity() {
             return
         }
 
-        // TODO: Aquí se guardará en SQLite después
-        // Por ahora solo mostrar confirmación
+        try {
+            // Crear objeto Cita
+            val cita = Cita(
+                nombreCliente = nombreCliente,
+                telefono = telefono,
+                direccion = direccion,
+                fechaVisita = fechaVisita,
+                horaVisita = horaVisita,
+                tipoConsulta = tipoConsultaSeleccionado,
+                notasAdicionales = notasAdicionales.ifEmpty { null },
+                estado = Cita.ESTADO_PENDIENTE,
+                fechaCreacion = obtenerFechaActual()
+            )
 
-        val mensajeExito = "✅ Cita guardada exitosamente!\n\n" +
-                "Cliente: $nombreCliente\n" +
-                "Fecha: $fechaVisita a las $horaVisita\n" +
-                "Tipo: $tipoConsultaSeleccionado"
+            // Guardar en base de datos
+            val citaId = databaseHelper.insertarCita(cita)
 
-        Toast.makeText(this, mensajeExito, Toast.LENGTH_LONG).show()
+            if (citaId > 0) {
+                // Éxito al guardar
+                val mensajeExito = "✅ Cita guardada exitosamente!\n\n" +
+                        "ID: $citaId\n" +
+                        "Cliente: $nombreCliente\n" +
+                        "Fecha: $fechaVisita a las $horaVisita\n" +
+                        "Tipo: $tipoConsultaSeleccionado"
 
-        // Limpiar formulario después de guardar
-        limpiarFormulario()
+                Toast.makeText(this, mensajeExito, Toast.LENGTH_LONG).show()
 
-        // Opcional: volver al menú después de un delay
-        // Handler(Looper.getMainLooper()).postDelayed({ volverAlMenu() }, 2000)
+                // Limpiar formulario después de guardar
+                limpiarFormulario()
+
+                // Opcional: navegar a detalle de la cita
+                navegarADetalleCita(citaId)
+            } else {
+                // Error al guardar
+                Toast.makeText(this, "❌ Error al guardar la cita. Inténtalo de nuevo.", Toast.LENGTH_LONG).show()
+            }
+
+        } catch (e: Exception) {
+            // Manejo de errores
+            println("❌ Error al guardar cita: ${e.message}")
+            Toast.makeText(this, "❌ Error inesperado al guardar la cita.", Toast.LENGTH_LONG).show()
+        }
+    }
+
+    /**
+     * Navegar al detalle de la cita recién creada
+     */
+    private fun navegarADetalleCita(citaId: Long) {
+        // Opcional: navegar al detalle después de un delay
+        Handler(Looper.getMainLooper()).postDelayed({
+            try {
+                // Obtener la cita recién guardada de la BD
+                val cita = databaseHelper.obtenerCitaPorId(citaId)
+
+                if (cita != null) {
+                    // Crear bundle para DetalleActivity
+                    val bundle = Bundle().apply {
+                        putString("nombre_cliente", cita.nombreCliente)
+                        putString("fecha_creacion", cita.fechaCreacion)
+                        putString("estado", cita.estado)
+                        putString("telefono", cita.telefono)
+                        putString("direccion", cita.direccion)
+                        putString("fecha_visita", cita.fechaVisita)
+                        putString("hora_visita", cita.horaVisita)
+                        putString("tipo_consulta", cita.tipoConsulta)
+                        putString("notas_adicionales", cita.notasAdicionales ?: "Sin notas adicionales")
+                    }
+
+                    val intent = Intent(this, DetalleActivity::class.java)
+                    intent.putExtra("tipo_detalle", "CITA")
+                    intent.putExtra("datos", bundle)
+
+                    startActivity(intent)
+                    finish()
+                }
+            } catch (e: Exception) {
+                println("❌ Error al navegar al detalle: ${e.message}")
+                // Si hay error, solo volver al menú
+                volverAlMenu()
+            }
+        }, 2000)
     }
 
     /**
@@ -334,6 +408,19 @@ class CrearCitaActivity : AppCompatActivity() {
             val scrollY = fieldY - (screenHeight - keyboardHeight - 300)
             scrollView.smoothScrollTo(0, scrollY)
         }
+    }
+
+    /**
+     * Obtener fecha actual formateada
+     */
+    private fun obtenerFechaActual(): String {
+        val calendar = Calendar.getInstance()
+        return String.format(
+            "%02d/%02d/%d",
+            calendar.get(Calendar.DAY_OF_MONTH),
+            calendar.get(Calendar.MONTH) + 1,
+            calendar.get(Calendar.YEAR)
+        )
     }
 
     /**
