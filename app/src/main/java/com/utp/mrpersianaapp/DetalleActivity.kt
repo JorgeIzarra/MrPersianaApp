@@ -255,28 +255,70 @@ class DetalleActivity : AppCompatActivity() {
     }
 
     /**
-     * Generar texto para compartir cotización
+     * Generar texto para compartir cotización - VERSIÓN MEJORADA
      */
     private fun generarTextoCotizacion(): String {
         return """
-            📋 COTIZACIÓN - MR. PERSIANA
+            📋 *COTIZACIÓN - MR. PERSIANA*
             
-            Cliente: ${tvNombreCliente.text}
+            👤 *Cliente:* ${tvNombreCliente.text}
             
-            🏷️ Productos:
-            ${tvListaProductos.text}
+            🏷️ *Productos Cotizados:*
+            ${formatearProductosParaCompartir()}
             
-            📍 Instalación: ${tvUbicacionInstalacion.text}
+            📍 *Instalación:* ${tvUbicacionInstalacion.text}
             
-            💰 Resumen:
-            ${tvSubtotalDetalle.text}
-            ${tvInstalacionDetalle.text}
-            ═══════════════════
-            ${tvTotalDetalle.text}
+            💰 *Resumen de Precios:*
+            • Subtotal: ${formatearPrecio(tvSubtotalDetalle.text.toString())}
+            • Instalación: ${formatearPrecio(tvInstalacionDetalle.text.toString())}
+            ━━━━━━━━━━━━━━━━━━━━━
+            *${formatearPrecio(tvTotalDetalle.text.toString())}*
             
-            📞 Contacto: Mr. Persiana
-            ✅ Cotización válida por 30 días
+            📞 *Contacto:* Mr. Persiana
+            ✅ *Cotización válida por 30 días*
         """.trimIndent()
+    }
+
+    /**
+     * Formatear productos para compartir de manera más legible
+     */
+    private fun formatearProductosParaCompartir(): String {
+        val productosTexto = tvListaProductos.text.toString()
+
+        // Si el texto está vacío o es el default
+        if (productosTexto.isEmpty() || productosTexto == "No hay productos registrados") {
+            return "• Sin productos especificados"
+        }
+
+        // Formatear el texto de productos para mejor legibilidad
+        return productosTexto
+            .replace("• Producto", "\n• *Producto")
+            .replace("📏 Dimensiones:", "  📏 Dimensiones:")
+            .replace("📦 Cantidad:", "  📦 Cantidad:")
+            .replace("🏷️ Tipo:", "  🏷️ Tipo:")
+            .replace("🎨 Color:", "  🎨 Color:")
+            .replace("🎀 Cenefa:", "  🎀 Cenefa:")
+            .replace("📐 Apertura:", "  📐 Apertura:")
+            .replace("🔧 Accionamiento:", "  🔧 Accionamiento:")
+            .replace("💰 ", "  💰 *")
+            .replace("$", "$*")
+            .trim()
+    }
+
+    /**
+     * Formatear precios para mejor legibilidad
+     */
+    private fun formatearPrecio(precioTexto: String): String {
+        // Extraer el número del texto
+        val numero = precioTexto.replace(Regex("[^0-9.]"), "").toDoubleOrNull() ?: 0.0
+
+        // Formatear con comas para miles y dos decimales
+        return when {
+            precioTexto.contains("Subtotal") -> "Subtotal: $${String.format("%,.2f", numero)}"
+            precioTexto.contains("Instalación") -> "Instalación: $${String.format("%,.2f", numero)}"
+            precioTexto.contains("TOTAL") -> "TOTAL: $${String.format("%,.2f", numero)}"
+            else -> "$${String.format("%,.2f", numero)}"
+        }
     }
 
     /**
