@@ -7,23 +7,23 @@ import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
 import android.view.View
-import android.widget.AdapterView
-import android.widget.ArrayAdapter
-import android.widget.Button
-import android.widget.EditText
-import android.widget.ScrollView
-import android.widget.Spinner
-import android.widget.Toast
-import android.view.ContextThemeWrapper
+import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
 import com.utp.mrpersianaapp.data.Cita
 import com.utp.mrpersianaapp.data.DatabaseHelper
+import com.utp.mrpersianaapp.data.DatabaseHelper.ClienteUnico  // ← ESTE ES EL IMPORT CLAVE
 import java.util.Calendar
+import android.view.ContextThemeWrapper
 
 class CrearCitaActivity : AppCompatActivity() {
 
     // Componentes de la interfaz
     private lateinit var scrollView: ScrollView
+    private lateinit var rgTipoCliente: RadioGroup
+    private lateinit var rbNuevoCliente: RadioButton
+    private lateinit var rbClienteExistente: RadioButton
+    private lateinit var layoutClienteExistente: LinearLayout
+    private lateinit var spinnerClienteExistente: Spinner
     private lateinit var etNombreCliente: EditText
     private lateinit var etTelefono: EditText
     private lateinit var etDireccion: EditText
@@ -38,6 +38,10 @@ class CrearCitaActivity : AppCompatActivity() {
     // Base de datos
     private lateinit var databaseHelper: DatabaseHelper
 
+    // Variables para clientes existentes - USANDO LA DATA CLASS DEL DATABASEHELPER
+    private var clientesUnicos = mutableListOf<ClienteUnico>()
+    private var clientesParaSpinner = mutableListOf<String>()
+
     // Opciones para el spinner de tipo de consulta
     private val tiposConsulta = arrayOf(
         "Selecciona el tipo de consulta...",
@@ -51,6 +55,13 @@ class CrearCitaActivity : AppCompatActivity() {
     // Variables para almacenar datos
     private var tipoConsultaSeleccionado: String = ""
 
+    // ❌ ELIMINAR ESTA DATA CLASS - YA NO LA NECESITAMOS
+    // data class ClienteUnico(
+    //     val nombre: String,
+    //     val telefono: String,
+    //     val direccion: String
+    // )
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_crear_cita)
@@ -61,8 +72,14 @@ class CrearCitaActivity : AppCompatActivity() {
         // Inicializar componentes
         initializeComponents()
 
-        // Configurar spinner
-        setupSpinner()
+        // Cargar clientes existentes
+        cargarClientesUnicos()
+
+        // Configurar RadioGroup
+        setupRadioGroup()
+
+        // Configurar spinners
+        setupSpinners()
 
         // Configurar campos de fecha y hora
         setupDateTimeFields()
@@ -79,6 +96,11 @@ class CrearCitaActivity : AppCompatActivity() {
      */
     private fun initializeComponents() {
         scrollView = findViewById(R.id.scrollViewCrearCita)
+        rgTipoCliente = findViewById(R.id.rgTipoCliente)
+        rbNuevoCliente = findViewById(R.id.rbNuevoCliente)
+        rbClienteExistente = findViewById(R.id.rbClienteExistente)
+        layoutClienteExistente = findViewById(R.id.layoutClienteExistente)
+        spinnerClienteExistente = findViewById(R.id.spinnerClienteExistente)
         etNombreCliente = findViewById(R.id.etNombreCliente)
         etTelefono = findViewById(R.id.etTelefono)
         etDireccion = findViewById(R.id.etDireccion)
@@ -92,9 +114,96 @@ class CrearCitaActivity : AppCompatActivity() {
     }
 
     /**
-     * Configurar el spinner de tipo de consulta
+     * Cargar clientes únicos desde la base de datos
      */
-    private fun setupSpinner() {
+    private fun cargarClientesUnicos() {
+        try {
+            // AHORA FUNCIONA PORQUE USAMOS EL MISMO TIPO DE DATA CLASS
+            val clientesUnicosObtenidos = databaseHelper.obtenerClientesUnicos()
+            clientesUnicos.clear()
+            clientesUnicos.addAll(clientesUnicosObtenidos)
+
+            // Crear lista para el spinner
+            clientesParaSpinner.clear()
+            clientesParaSpinner.add("Selecciona un cliente...")
+
+            clientesUnicos.forEach { cliente ->
+                val formatoCliente = "${cliente.nombre} - ${cliente.telefono}"
+                clientesParaSpinner.add(formatoCliente)
+            }
+
+            println("👤 Clientes únicos cargados: ${clientesUnicos.size}")
+
+        } catch (e: Exception) {
+            println("❌ Error al cargar clientes únicos: ${e.message}")
+            // Fallback en caso de error
+            clientesParaSpinner.clear()
+            clientesParaSpinner.add("No hay clientes registrados")
+        }
+    }
+
+    /**
+     * Configurar el RadioGroup para seleccionar tipo de cliente
+     */
+    private fun setupRadioGroup() {
+        rgTipoCliente.setOnCheckedChangeListener { _, checkedId ->
+            when (checkedId) {
+                R.id.rbNuevoCliente -> {
+                    // Mostrar campos editables para nuevo cliente
+                    layoutClienteExistente.visibility = View.GONE
+                    habilitarCamposCliente(true)
+                    limpiarCamposCliente()
+                }
+                R.id.rbClienteExistente -> {
+                    // Mostrar spinner para cliente existente
+                    layoutClienteExistente.visibility = View.VISIBLE
+                    habilitarCamposCliente(false)
+                }
+            }
+        }
+    }
+
+    /**
+     * Configurar todos los spinners
+     */
+    private fun setupSpinners() {
+        // Spinner de clientes existentes
+        setupSpinnerClientes()
+
+        // Spinner de tipo de consulta (existente)
+        setupSpinnerTipoConsulta()
+    }
+
+    /**
+     * Configurar spinner de clientes existentes
+     */
+    private fun setupSpinnerClientes() {
+        val adapter = ArrayAdapter(
+            this,
+            android.R.layout.simple_spinner_item,
+            clientesParaSpinner
+        )
+        adapter.setDropDownViewResource(R.layout.spinner_dropdown_item)
+        spinnerClienteExistente.adapter = adapter
+
+        spinnerClienteExistente.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+            override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
+                if (position > 0 && position <= clientesUnicos.size) {
+                    // Auto-rellenar campos con datos del cliente seleccionado
+                    val clienteSeleccionado = clientesUnicos[position - 1]
+                    autoRellenarCamposCliente(clienteSeleccionado)
+                }
+                // Cambiar color del texto para visibilidad
+                (view as? TextView)?.setTextColor(resources.getColor(R.color.negro_texto, null))
+            }
+            override fun onNothingSelected(parent: AdapterView<*>?) {}
+        }
+    }
+
+    /**
+     * Configurar el spinner de tipo de consulta (método existente mejorado)
+     */
+    private fun setupSpinnerTipoConsulta() {
         val adapter = ArrayAdapter(
             this,
             android.R.layout.simple_spinner_item,
@@ -111,11 +220,61 @@ class CrearCitaActivity : AppCompatActivity() {
                     tipoConsultaSeleccionado = tiposConsulta[position]
                 }
                 // Aseguramos que el texto sea visible cambiando su color
-                (view as? android.widget.TextView)?.setTextColor(resources.getColor(R.color.negro_texto, null))
+                (view as? TextView)?.setTextColor(resources.getColor(R.color.negro_texto, null))
             }
 
             override fun onNothingSelected(parent: AdapterView<*>?) {}
         }
+    }
+
+    /**
+     * Auto-rellenar campos con datos del cliente seleccionado
+     */
+    private fun autoRellenarCamposCliente(cliente: ClienteUnico) {
+        etNombreCliente.setText(cliente.nombre)
+        etTelefono.setText(cliente.telefono)
+        etDireccion.setText(cliente.direccion)
+
+        // Mostrar mensaje informativo
+        Toast.makeText(this, "✅ Datos del cliente cargados: ${cliente.nombre}", Toast.LENGTH_SHORT).show()
+    }
+
+    /**
+     * Habilitar/deshabilitar campos de cliente
+     */
+    private fun habilitarCamposCliente(habilitar: Boolean) {
+        etNombreCliente.isEnabled = habilitar
+        etTelefono.isEnabled = habilitar
+        etDireccion.isEnabled = habilitar
+
+        // Cambiar apariencia visual
+        val alpha = if (habilitar) 1.0f else 0.6f
+        etNombreCliente.alpha = alpha
+        etTelefono.alpha = alpha
+        etDireccion.alpha = alpha
+
+        // Cambiar hint según el estado
+        if (!habilitar) {
+            etNombreCliente.hint = "Se llenará automáticamente..."
+            etTelefono.hint = "Se llenará automáticamente..."
+            etDireccion.hint = "Se llenará automáticamente..."
+        } else {
+            etNombreCliente.hint = "Ingrese el nombre completo"
+            etTelefono.hint = "Ej: 6123-4567"
+            etDireccion.hint = "Calle, casa/edificio, sector, ciudad"
+        }
+    }
+
+    /**
+     * Limpiar campos de cliente
+     */
+    private fun limpiarCamposCliente() {
+        etNombreCliente.setText("")
+        etTelefono.setText("")
+        etDireccion.setText("")
+        etNombreCliente.error = null
+        etTelefono.error = null
+        etDireccion.error = null
     }
 
     /**
@@ -353,19 +512,21 @@ class CrearCitaActivity : AppCompatActivity() {
      * Limpiar todos los campos del formulario
      */
     private fun limpiarFormulario() {
-        etNombreCliente.setText("")
-        etTelefono.setText("")
-        etDireccion.setText("")
+        // Resetear RadioGroup a nuevo cliente
+        rbNuevoCliente.isChecked = true
+        layoutClienteExistente.visibility = View.GONE
+        spinnerClienteExistente.setSelection(0)
+
+        // Habilitar campos y limpiar
+        habilitarCamposCliente(true)
+        limpiarCamposCliente()
+
+        // Limpiar otros campos
         etFechaVisita.setText("")
         etHoraVisita.setText("")
         etNotasAdicionales.setText("")
         spinnerTipoConsulta.setSelection(0)
         tipoConsultaSeleccionado = ""
-
-        // Limpiar errores
-        etNombreCliente.error = null
-        etTelefono.error = null
-        etDireccion.error = null
 
         Toast.makeText(this, "Formulario limpiado", Toast.LENGTH_SHORT).show()
     }
@@ -431,11 +592,4 @@ class CrearCitaActivity : AppCompatActivity() {
         startActivity(intent)
         finish()
     }
-
-//    /**
-//     * Manejar el botón atrás del dispositivo
-//     */
-//    override fun onBackPressed() {
-//        volverAlMenu()
-//    }
 }

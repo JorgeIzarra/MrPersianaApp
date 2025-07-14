@@ -58,6 +58,13 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME
         private const val PROD_FECHA_CREACION = "fecha_creacion"
     }
 
+    // Data class para manejar clientes únicos (definida aquí para consistencia)
+    data class ClienteUnico(
+        val nombre: String,
+        val telefono: String,
+        val direccion: String
+    )
+
     override fun onCreate(db: SQLiteDatabase) {
         // Crear tabla CITAS
         val createCitasTable = """
@@ -231,6 +238,144 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME
 
         println("📅 Estado de cita $id actualizado a: $nuevoEstado")
         return filasAfectadas
+    }
+
+    // ==================== NUEVOS MÉTODOS PARA CLIENTES ÚNICOS ====================
+
+    /**
+     * Obtener lista de clientes únicos de la tabla citas
+     * Agrupa por nombre, teléfono y dirección para evitar duplicados
+     */
+    fun obtenerClientesUnicos(): List<ClienteUnico> {
+        val clientesUnicos = mutableListOf<ClienteUnico>()
+        val db = readableDatabase
+
+        // Query para obtener clientes únicos ordenados por fecha más reciente
+        val query = """
+            SELECT $CITA_NOMBRE_CLIENTE, $CITA_TELEFONO, $CITA_DIRECCION, 
+                   MAX($CITA_FECHA_CREACION) as ultima_cita
+            FROM $TABLE_CITAS 
+            GROUP BY $CITA_NOMBRE_CLIENTE, $CITA_TELEFONO, $CITA_DIRECCION
+            ORDER BY ultima_cita DESC
+        """.trimIndent()
+
+        val cursor = db.rawQuery(query, null)
+
+        if (cursor.moveToFirst()) {
+            do {
+                val cliente = ClienteUnico(
+                    nombre = cursor.getString(cursor.getColumnIndexOrThrow(CITA_NOMBRE_CLIENTE)),
+                    telefono = cursor.getString(cursor.getColumnIndexOrThrow(CITA_TELEFONO)),
+                    direccion = cursor.getString(cursor.getColumnIndexOrThrow(CITA_DIRECCION))
+                )
+                clientesUnicos.add(cliente)
+            } while (cursor.moveToNext())
+        }
+
+        cursor.close()
+        db.close()
+
+        println("👤 Obtenidos ${clientesUnicos.size} clientes únicos")
+        return clientesUnicos
+    }
+
+    /**
+     * Obtener datos completos de un cliente por nombre
+     * Útil para auto-rellenar formularios
+     */
+    fun obtenerDatosClientePorNombre(nombreCliente: String): ClienteUnico? {
+        val db = readableDatabase
+
+        // Query para obtener la información más reciente del cliente
+        val query = """
+            SELECT $CITA_NOMBRE_CLIENTE, $CITA_TELEFONO, $CITA_DIRECCION 
+            FROM $TABLE_CITAS 
+            WHERE $CITA_NOMBRE_CLIENTE = ? 
+            ORDER BY $CITA_FECHA_CREACION DESC 
+            LIMIT 1
+        """.trimIndent()
+
+        val cursor = db.rawQuery(query, arrayOf(nombreCliente))
+
+        var cliente: ClienteUnico? = null
+        if (cursor.moveToFirst()) {
+            cliente = ClienteUnico(
+                nombre = cursor.getString(cursor.getColumnIndexOrThrow(CITA_NOMBRE_CLIENTE)),
+                telefono = cursor.getString(cursor.getColumnIndexOrThrow(CITA_TELEFONO)),
+                direccion = cursor.getString(cursor.getColumnIndexOrThrow(CITA_DIRECCION))
+            )
+        }
+
+        cursor.close()
+        db.close()
+
+        return cliente
+    }
+
+    /**
+     * Verificar si un cliente ya existe en la base de datos
+     * Útil para prevenir duplicados o mostrar alertas
+     */
+    fun clienteExiste(nombreCliente: String, telefono: String): Boolean {
+        val db = readableDatabase
+
+        val query = """
+            SELECT COUNT(*) 
+            FROM $TABLE_CITAS 
+            WHERE $CITA_NOMBRE_CLIENTE = ? AND $CITA_TELEFONO = ?
+        """.trimIndent()
+
+        val cursor = db.rawQuery(query, arrayOf(nombreCliente, telefono))
+
+        var existe = false
+        if (cursor.moveToFirst()) {
+            existe = cursor.getInt(0) > 0
+        }
+
+        cursor.close()
+        db.close()
+
+        return existe
+    }
+
+    /**
+     * Obtener historial de citas de un cliente específico
+     * Útil para mostrar información adicional del cliente
+     */
+    fun obtenerHistorialCliente(nombreCliente: String, telefono: String): List<Cita> {
+        val citas = mutableListOf<Cita>()
+        val db = readableDatabase
+
+        val query = """
+            SELECT * FROM $TABLE_CITAS 
+            WHERE $CITA_NOMBRE_CLIENTE = ? AND $CITA_TELEFONO = ? 
+            ORDER BY $CITA_FECHA_CREACION DESC
+        """.trimIndent()
+
+        val cursor = db.rawQuery(query, arrayOf(nombreCliente, telefono))
+
+        if (cursor.moveToFirst()) {
+            do {
+                val cita = Cita(
+                    id = cursor.getLong(cursor.getColumnIndexOrThrow(CITA_ID)),
+                    nombreCliente = cursor.getString(cursor.getColumnIndexOrThrow(CITA_NOMBRE_CLIENTE)),
+                    telefono = cursor.getString(cursor.getColumnIndexOrThrow(CITA_TELEFONO)),
+                    direccion = cursor.getString(cursor.getColumnIndexOrThrow(CITA_DIRECCION)),
+                    fechaVisita = cursor.getString(cursor.getColumnIndexOrThrow(CITA_FECHA_VISITA)),
+                    horaVisita = cursor.getString(cursor.getColumnIndexOrThrow(CITA_HORA_VISITA)),
+                    tipoConsulta = cursor.getString(cursor.getColumnIndexOrThrow(CITA_TIPO_CONSULTA)),
+                    notasAdicionales = cursor.getString(cursor.getColumnIndexOrThrow(CITA_NOTAS)),
+                    estado = cursor.getString(cursor.getColumnIndexOrThrow(CITA_ESTADO)),
+                    fechaCreacion = cursor.getString(cursor.getColumnIndexOrThrow(CITA_FECHA_CREACION))
+                )
+                citas.add(cita)
+            } while (cursor.moveToNext())
+        }
+
+        cursor.close()
+        db.close()
+
+        return citas
     }
 
     // ==================== MÉTODOS CRUD PARA COTIZACIONES ====================

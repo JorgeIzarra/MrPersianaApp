@@ -62,6 +62,75 @@
             android:textStyle="bold"
             android:layout_marginBottom="16dp" />
 
+        <!-- NUEVO: RadioGroup para seleccionar tipo de cliente -->
+        <RadioGroup
+            android:id="@+id/rgTipoCliente"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginBottom="16dp"
+            android:background="@color/gris_claro"
+            android:padding="12dp">
+
+            <RadioButton
+                android:id="@+id/rbNuevoCliente"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="🆕 Nuevo Cliente"
+                android:textSize="14sp"
+                android:textColor="@color/negro_texto"
+                android:textStyle="bold"
+                android:checked="true" />
+
+            <RadioButton
+                android:id="@+id/rbClienteExistente"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="👤 Cliente Existente"
+                android:textSize="14sp"
+                android:textColor="@color/negro_texto"
+                android:textStyle="bold" />
+
+        </RadioGroup>
+
+        <!-- NUEVO: Spinner para clientes existentes (inicialmente oculto) -->
+        <LinearLayout
+            android:id="@+id/layoutClienteExistente"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:visibility="gone"
+            android:layout_marginBottom="16dp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Seleccionar Cliente Existente *"
+                android:textSize="16sp"
+                android:textColor="@color/negro_texto"
+                android:textStyle="bold"
+                android:layout_marginBottom="8dp" />
+
+            <Spinner
+                android:id="@+id/spinnerClienteExistente"
+                android:layout_width="match_parent"
+                android:layout_height="48dp"
+                android:background="@drawable/spinner_background"
+                android:padding="12dp"
+                android:layout_marginBottom="8dp" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="💡 Tip: Al seleccionar un cliente, se auto-rellenarán sus datos"
+                android:textSize="12sp"
+                android:textColor="@color/gris_medio"
+                android:fontFamily="sans-serif-medium" />
+
+        </LinearLayout>
+
         <!-- Nombre del cliente -->
         <TextView
             android:layout_width="wrap_content"

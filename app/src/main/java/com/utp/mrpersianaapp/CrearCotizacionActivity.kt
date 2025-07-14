@@ -149,13 +149,45 @@ class CrearCotizacionActivity : AppCompatActivity() {
         spinnerCitaVinculada.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
             override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
                 if (position > 0) {
-                    // Auto-llenar nombre del cliente desde la cita seleccionada
+                    // ✅ CAMBIO 1: Auto-llenar nombre del cliente y BLOQUEAR campo
                     val citaSeleccionada = citasDisponibles[position - 1]
                     etNombreCliente.setText(citaSeleccionada.nombreCliente)
+
+                    // Bloquear el campo y cambiar apariencia
+                    habilitarCampoNombre(false)
+
+                    // Mostrar mensaje informativo
+                    Toast.makeText(this@CrearCotizacionActivity,
+                        "✅ Cliente vinculado: ${citaSeleccionada.nombreCliente}",
+                        Toast.LENGTH_SHORT).show()
+                } else {
+                    // ✅ CAMBIO 2: Limpiar campo y HABILITAR cuando sea "Sin cita vinculada"
+                    etNombreCliente.setText("")
+
+                    // Habilitar el campo para escritura manual
+                    habilitarCampoNombre(true)
                 }
                 (view as? TextView)?.setTextColor(resources.getColor(R.color.negro_texto, null))
             }
             override fun onNothingSelected(parent: AdapterView<*>?) {}
+        }
+    }
+
+    /**
+     * ✅ NUEVO MÉTODO: Habilitar/deshabilitar campo nombre
+     */
+    private fun habilitarCampoNombre(habilitar: Boolean) {
+        etNombreCliente.isEnabled = habilitar
+
+        // Cambiar apariencia visual
+        val alpha = if (habilitar) 1.0f else 0.6f
+        etNombreCliente.alpha = alpha
+
+        // Cambiar hint según el estado
+        if (!habilitar) {
+            etNombreCliente.hint = "Cliente vinculado a la cita seleccionada"
+        } else {
+            etNombreCliente.hint = "Ingrese el nombre del cliente"
         }
     }
 
@@ -785,7 +817,10 @@ class CrearCotizacionActivity : AppCompatActivity() {
     }
 
     private fun limpiarFormulario() {
+        // ✅ CAMBIO: Limpiar y habilitar campo nombre
         etNombreCliente.setText("")
+        habilitarCampoNombre(true)
+
         etObservaciones.setText("")
         spinnerCitaVinculada.setSelection(0)
         rgUbicacionInstalacion.clearCheck()
